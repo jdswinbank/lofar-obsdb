@@ -62,7 +62,7 @@ class Observation(models.Model):
     parset = models.TextField()
 
     def __unicode__(self):
-        return self.name
+        return self.obsid
 
 class Beam(models.Model):
     observation = models.ForeignKey(Observation)
@@ -70,4 +70,4 @@ class Beam(models.Model):
     calibrators = models.ManyToManyField('self', blank=True)
 
     def __unicode__(self):
-        return self.observation.name + " beam " + str(self.beam)
+        return self.observation.obsid + " beam " + str(self.beam)
