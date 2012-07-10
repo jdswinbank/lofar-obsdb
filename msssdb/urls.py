@@ -16,4 +16,9 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
+
+
+    url(r'^observationdb/surveys/$', 'observationdb.views.surveys'),
+    url(r'^observationdb/position_search/$', 'observationdb.views.position_search'),
+
 )
