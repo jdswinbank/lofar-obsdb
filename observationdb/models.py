@@ -1,4 +1,7 @@
 from django.db import models
+from pyrap.measures import measures
+
+EPOCH = "J2000"
 
 class Survey(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -14,6 +17,17 @@ class Field(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    def distance_from(self, ra, dec):
+        """
+        Returns angular distance between self and ra, dec. All values are
+        given and returned in radians.
+        """
+        dm = measures()
+        return dm.separation(
+            dm.direction(EPOCH, "%frad" % ra, "%frad" % dec),
+            dm.direction(EPOCH, "%frad" % self.ra, "%frad" % self.dec)
+        ).get_value("rad")
 
 class Station(models.Model):
     name = models.CharField(max_length=10, unique=True)
