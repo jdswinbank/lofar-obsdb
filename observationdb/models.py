@@ -54,7 +54,6 @@ class Observation(models.Model):
         ('LBA_Y', 'LBA_Y')
     )
     obsid = models.CharField(max_length=10, unique=True)
-    field = models.ForeignKey(Field)
     stations = models.ManyToManyField(Station)
     antennaset = models.CharField(max_length=15, choices=ANTENNASET_CHOICES)
     start_time = models.DateTimeField()
@@ -67,7 +66,8 @@ class Observation(models.Model):
 class Beam(models.Model):
     observation = models.ForeignKey(Observation)
     beam = models.IntegerField()
-    calibrators = models.ManyToManyField('self', blank=True)
+    field = models.ForeignKey(Field)
+    calibrator = models.ForeignKey('self', blank=True, related_name='+', null=True)
 
     def __unicode__(self):
         return self.observation.obsid + " beam " + str(self.beam)
