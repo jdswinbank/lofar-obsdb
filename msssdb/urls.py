@@ -40,8 +40,4 @@ urlpatterns = patterns('',
     url(r'^field/(?P<pk>\d+)/$', 'observationdb.views.field_detail'),
     url(r'^field/$', 'observationdb.views.field_list'),
 
-    url(r'^position_search/$', 'observationdb.views.position_search'),
-
-
-
 )
