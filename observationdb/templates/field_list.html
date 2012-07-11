@@ -1,3 +1,5 @@
+{% load position %}
+
 {% if field_list %}
 <h1>Available fields</h1>
 
@@ -24,8 +26,8 @@
 
   <tr>
     <td><a href="/field/{{ field.pk }}/">{{ field.name }}</a></td>
-    <td>{{ field.ra }}</td>
-    <td>{{ field.dec }}</td>
+    <td>{{ field.ra|format_angle:"time" }}</td>
+    <td>{{ field.dec|format_angle:"angle" }}</td>
     <td>{{ field.survey.name }}</td>
     <td>{{ field.beam_set.all.count }}</td>
   </tr>

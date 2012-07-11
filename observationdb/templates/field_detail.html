@@ -1,3 +1,5 @@
+{% load position %}
+
 {% if field %}
 
 <h1>{{ field.name }}</h1>
@@ -14,11 +16,11 @@ occasions.</p>
 <table>
   <tr>
     <th>RA</th>
-    <td>{{ field.ra }}</td>
+    <td>{{ field.ra|format_angle:"time" }}</td>
   </tr>
   <tr>
     <th>Dec</th>
-    <td>{{field.dec }}</td>
+    <td>{{field.dec|format_angle:"angle" }}</td>
   </tr>
 </table>
 
