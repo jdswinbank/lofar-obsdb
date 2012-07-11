@@ -18,7 +18,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
 
 
-    url(r'^observationdb/surveys/$', 'observationdb.views.surveys'),
-    url(r'^observationdb/position_search/$', 'observationdb.views.position_search'),
+    url(r'^surveys/$', 'observationdb.views.surveys'),
+    url(r'^position_search/$', 'observationdb.views.position_search'),
 
 )
