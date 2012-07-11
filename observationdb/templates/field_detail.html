@@ -1,9 +1,24 @@
+{% extends "base.html" %}
+{% block contents %}
+
 {% load position %}
 
 {% if field %}
 
 <h1>{{ field.name }}</h1>
 
+<hr />
+
+<table style="text-align: left; margin-bottom: 1em;">
+  <tr>
+    <th style="padding-right: 1em;">Right Ascension</th>
+    <td>{{ field.ra|format_angle:"time" }}</td>
+  </tr>
+  <tr>
+    <th>Declination</th>
+    <td>{{field.dec|format_angle:"angle" }}</td>
+  </tr>
+</table>
 
 <p>This field is part of the <strong>{{ field.survey.name }}</strong>
 survey. It has been observed on {{ field.beam_set.count }} separate
@@ -13,24 +28,15 @@ occasions.</p>
   <p>This field is a calibrator.</p>
 {% endif %}
 
-<table>
-  <tr>
-    <th>RA</th>
-    <td>{{ field.ra|format_angle:"time" }}</td>
-  </tr>
-  <tr>
-    <th>Dec</th>
-    <td>{{field.dec|format_angle:"angle" }}</td>
-  </tr>
-</table>
-
-<table>
-  <tr>
-    <th>Observation</th>
-    <th>Beam</th>
-    <th>Date</th>
-    <th>Duration (seconds)</th>
-  </tr>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Observation</th>
+      <th>Beam</th>
+      <th>Date</th>
+      <th>Duration (seconds)</th>
+    </tr>
+  </thead>
   {% for beam in field.beam_set.all %}
   <tr>
     <td><a href="/observation/{{ beam.observation.pk }}/">{{ beam.observation.obsid }}</a></td>
@@ -42,3 +48,4 @@ occasions.</p>
 </table>
 
 {% endif %}
+{% endblock %}

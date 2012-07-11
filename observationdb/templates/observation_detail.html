@@ -1,38 +1,57 @@
+{% extends "base.html" %}
+{% block contents %}
+
 {% if observation %}
 
 <h1>{{ observation.obsid }}</h1>
 
-<table>
-  <tr>
-    <th>Start Time</th>
-    <td>{{ observation.start_time|date:"Y-m-d H:i:s" }}</td>
-  </tr>
-    <th>Duration</th>
-    <td>{{ observation.duration }}</td>
-  </tr>
-  </tr>
-    <th>Antenna Set</th>
-    <td>{{ observation.antennaset }}</td>
-  </tr>
-  </tr>
-    <th>Stations</th>
-    <td>
-      {% for station in observation.stations.all %}
-        {{ station.name }}{% if not forloop.last %},{% endif %}
-      {% endfor %}
-    </td>
-  </tr>
-  {% for beam in observation.beam_set.all %}
-  <tr>
-    <th colspan=2>Beam {{ beam.beam }}</th>
-  </tr>
-  <tr>
-    <th>Field</th>
-    <td><a href="/field/{{ beam.field.pk }}/">{{ beam.field.name }}</a></td>
-  </tr>
-  {% endfor %}
-</table>
+<hr />
 
+<div class="tabbable tabs-left">
+  <ul class="nav nav-tabs">
+    <li class="active"><a href="#tab1" data-toggle="tab">Summary</a></li>
+    <li><a href="#tab2" data-toggle="tab">Parset</a></li>
+  </ul>
+
+  <div class="tab-content">
+    <div class="tab-pane active" id="tab1">
+      <table style="text-align: left; vertical-align: top" class="table table-bordered">
+        <tr>
+          <th>Date</th>
+          <td>{{ observation.start_time|date:"Y-m-d" }}</td>
+        </tr>
+        <tr>
+          <th>Start Time</th>
+          <td>{{ observation.start_time|date:"H:i:s" }}</td>
+        </tr>
+          <th>Duration</th>
+          <td>{{ observation.duration }}</td>
+        </tr>
+        </tr>
+          <th>Antenna&nbsp;Set</th>
+          <td>{{ observation.antennaset }}</td>
+        </tr>
+        </tr>
+          <th>Stations</th>
+          <td>
+            {% for station in observation.stations.all %}
+              {{ station.name }}{% if not forloop.last %},{% endif %}
+            {% endfor %}
+          </td>
+        </tr>
+        {% for beam in observation.beam_set.all %}
+        <tr>
+          <th>Beam {{ beam.beam }}</th>
+          <td><a href="/field/{{ beam.field.pk }}/">{{ beam.field.name }}</a></td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    <div class="tab-pane" id="tab2">
+      <pre>{{observation.parset}}</pre>
+    </div>
+  </div>
+</div>
 
 {% endif %}
-
+{% endblock %}

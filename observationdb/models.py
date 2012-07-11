@@ -64,6 +64,9 @@ class Observation(models.Model):
     def __unicode__(self):
         return self.obsid
 
+    class Meta:
+        ordering = ['start_time']
+
 class Beam(models.Model):
     observation = models.ForeignKey(Observation)
     beam = models.IntegerField()
@@ -72,3 +75,6 @@ class Beam(models.Model):
 
     def __unicode__(self):
         return self.observation.obsid + " beam " + str(self.beam)
+
+    class Meta:
+        ordering = ['observation__start_time']

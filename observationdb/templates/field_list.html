@@ -2,25 +2,27 @@
 {% load position %}
 
 {% block contents %}
-{% if field_list %}
-<!--<h1>Available fields</h1>-->
-
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
 <form action="/field/" method="post" class="well">
-<h2>Filter Results</h2>
 {% csrf_token %}
+<h2>Filter Listing <small>Currently displaying {{ field_list|length }} fields</small></h2>
 
 <table>
+  {% if form.non_field_errors %}
+  <tr><td colspan="3">{% for error in form.non_field_errors %}<br />{{ error }}{% endfor %}</td></tr>
+  {% endif %}
   <tr>
     {% for field in form %}
-    <td style="vertical-align: top;">
+    <td style="vertical-align: top; min-width:10em;">
       <div class="control-group {% if field.errors %}error{% endif %}">
-        <label class="control-label" for="id_ra">{{field.label}}</label>
+        <label class="control-label" for="id_{{field.name}}">{{field.label}}</label>
         <div class="controls">
           {{ field }}
           {% if field.errors %}
-          <span class="help-inline">{{ field.errors }}</span>
+          {% for error in field.errors %}
+          <br /><span class="help-inline" style="padding-left:0em;">{{ error }}</span>
+          {% endfor %}
           {% endif %}
         </div>
       </div>
@@ -28,8 +30,11 @@
     {% endfor %}
   </tr>
   <tr>
-    <td><input class="btn btn-primary" type="submit" value="Filter" /></td>
-    <td colspan="2" style="text-align:right">Input in decimal degrees.</td>
+    <td colspan="2">
+      <input class="btn btn-primary" type="submit" value="Apply Filter" name="apply" />
+      <input class="btn btn-danger" type="submit" value="Clear Filter" name="clear"/>
+    </td>
+    <td style="text-align:right">Input in decimal degrees.</td>
   </tr>
 </table>
 </form>
@@ -41,8 +46,8 @@
       <th>RA</th>
       <th>Dec</th>
       <th>Survey</th>
-      <th>Calibrator</th>
       <th># Observations</th>
+      <th>Calibrator?</th>
     </tr>
   </thead>
 
@@ -53,14 +58,10 @@
     <td>{{ field.ra|format_angle:"time" }}</td>
     <td>{{ field.dec|format_angle:"angle" }}</td>
     <td>{{ field.survey.name }}</td>
-    <td>{% if field.calibrator %}<i class="icon-ok"></i>{% endif %}</td>
     <td>{{ field.beam_set.all.count }}</td>
+    <td>{% if field.calibrator %}<i class="icon-ok"></i>{% endif %}</td>
   </tr>
 
   {% endfor %}
 </table>
-
-{% else %}
-  <p>No fields are available</p>
-{% endif %}
 {% endblock %}

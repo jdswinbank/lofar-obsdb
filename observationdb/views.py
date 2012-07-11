@@ -1,3 +1,5 @@
+import math
+
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -40,14 +42,16 @@ def field_detail(request, pk):
 
 def field_list(request):
     fields = Field.objects.all()
-    if request.method == 'POST':
+    if request.method == 'POST' and not 'clear' in request.POST:
         form = FieldFilterForm(request.POST)
         if form.is_valid():
             ra = form.cleaned_data['ra']
             dec = form.cleaned_data['dec']
             radius = form.cleaned_data['radius']
             if not None in (ra, dec, radius):
-                fields = filter(lambda x: x.distance_from(ra, dec) < radius, fields)
+                # Fudge factor to account for floating point rouding errors:
+                # dec of 90 with 90 degree search doesn't quite hit dec of 0!
+                fields = filter(lambda x: x.distance_from(math.radians(ra), math.radians(dec)) <= math.radians(radius) + 1e-5, fields)
     else:
         form = FieldFilterForm()
 
