@@ -18,22 +18,26 @@
       <table style="text-align: left; vertical-align: top" class="table table-bordered">
         <tr>
           <th>Date</th>
-          <td>{{ observation.start_time|date:"Y-m-d" }}</td>
+          <td colspan="2">{{ observation.start_time|date:"Y-m-d" }}</td>
         </tr>
         <tr>
           <th>Start Time</th>
-          <td>{{ observation.start_time|date:"H:i:s" }}</td>
+          <td colspan="2">{{ observation.start_time|date:"H:i:s" }}</td>
         </tr>
           <th>Duration</th>
-          <td>{{ observation.duration }}</td>
+          <td colspan="2">{{ observation.duration }}</td>
         </tr>
         </tr>
           <th>Antenna&nbsp;Set</th>
-          <td>{{ observation.antennaset }}</td>
+          <td colspan="2">{{ observation.antennaset }}</td>
         </tr>
+        <tr>
+          <th>Clock</th>
+          <td colspan="2">{{ observation.clock }} MHz</td>
         </tr>
+        <tr>
           <th>Stations</th>
-          <td>
+          <td colspan="2">
             {% for station in observation.stations.all %}
               {{ station.name }}{% if not forloop.last %},{% endif %}
             {% endfor %}
@@ -41,8 +45,13 @@
         </tr>
         {% for beam in observation.beam_set.all %}
         <tr>
-          <th>Beam {{ beam.beam }}</th>
-          <td><a href="/field/{{ beam.field.pk }}/">{{ beam.field.name }}</a></td>
+          <th rowspan="2">Beam {{ beam.beam }}</th>
+          <th>Target</th>
+          <td style="width: 100%"><a href="/field/{{ beam.field.pk }}/">{{ beam.field.name }}</a></td>
+        </tr>
+        <tr>
+          <th>Subbands</th>
+          <td>{{ beam.subbands.count }}</a></td>
         </tr>
         {% endfor %}
       </table>
