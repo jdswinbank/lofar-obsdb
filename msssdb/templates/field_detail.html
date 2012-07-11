@@ -1,0 +1,42 @@
+{% if field %}
+
+<h1>{{ field.name }}</h1>
+
+
+<p>This field is part of the <strong>{{ field.survey.name }}</strong>
+survey. It has been observed on {{ field.beam_set.count }} separate
+occasions.</p>
+
+{% if field.calibrator %}
+  <p>This field is a calibrator.</p>
+{% endif %}
+
+<table>
+  <tr>
+    <th>RA</th>
+    <td>{{ field.ra }}</td>
+  </tr>
+  <tr>
+    <th>Dec</th>
+    <td>{{field.dec }}</td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th>Observation</th>
+    <th>Beam</th>
+    <th>Date</th>
+    <th>Duration (seconds)</th>
+  </tr>
+  {% for beam in field.beam_set.all %}
+  <tr>
+    <td><a href="/observation/{{ beam.observation.pk }}/">{{ beam.observation.obsid }}</a></td>
+    <td>{{ beam.beam }}</td>
+    <td>{{ beam.observation.start_time }}</td>
+    <td>{{ beam.observation.duration }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% endif %}

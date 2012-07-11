@@ -1,0 +1,37 @@
+{% if field_list %}
+<h1>Available fields</h1>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="/field/" method="post">
+{% csrf_token %}
+{{ form.as_p }}
+<input type="submit" value="Submit" />
+</form>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>RA</th>
+      <th>Dec</th>
+      <th>Survey</th>
+      <th>Number of observations</th>
+    </tr>
+  </thead>
+
+  {% for field in field_list %}
+
+  <tr>
+    <td><a href="/field/{{ field.pk }}/">{{ field.name }}</a></td>
+    <td>{{ field.ra }}</td>
+    <td>{{ field.dec }}</td>
+    <td>{{ field.survey.name }}</td>
+    <td>{{ field.beam_set.all.count }}</td>
+  </tr>
+
+  {% endfor %}
+
+{% else %}
+  <p>No fields are available</p>
+{% endif %}

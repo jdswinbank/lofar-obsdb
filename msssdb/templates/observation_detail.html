@@ -1,0 +1,30 @@
+{% if observation %}
+
+<h1>{{ observation.obsid }}</h1>
+
+<table>
+  <tr>
+    <th>Start Time</th>
+    <td>{{ observation.start_time }}</td>
+  </tr>
+    <th>Duration</th>
+    <td>{{ observation.duration }}</td>
+  </tr>
+  </tr>
+    <th>Antenna Set</th>
+    <td>{{ observation.antennaset}}</td>
+  </tr>
+  {% for beam in observation.beam_set.all %}
+  <tr>
+    <th colspan=2>Beam {{ beam.beam }}</th>
+  </tr>
+  <tr>
+    <th>Field</th>
+    <td><a href="/field/{{ beam.field.pk }}/">{{ beam.field.name }}</a></td>
+  </tr>
+  {% endfor %}
+</table>
+
+
+{% endif %}
+

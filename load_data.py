@@ -212,7 +212,7 @@ def upload_to_djangodb(parsets, field_list):
 if __name__ == "__main__":
     field_list = parse_field_file(sys.argv[1])
 
-    filenames = glob.glob("/home/jds/tmp/parsets/L*.parset")
+    filenames = glob.glob("/home/jds/tmp/parsets/L52*.parset")
     parsets = load_parsets(filenames)
     parsets = [
         parset for parset in parsets if

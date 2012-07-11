@@ -1,0 +1,9 @@
+{% if survey %}
+
+<h1>{{ survey.name }}</h1>
+
+<p>This survey consists of {{ survey.field_set.count }} fields which have been
+observed with {{ n_beams }} beams starting between {{ start_time }} and
+{{ stop_time }}.</p>
+
+{% endif %}
