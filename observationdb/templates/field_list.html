@@ -8,9 +8,30 @@
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
 <form action="/field/" method="post" class="well">
+<h2>Filter Results</h2>
 {% csrf_token %}
-{{ form.as_p }}
-<input type="submit" value="Submit" />
+
+<table>
+  <tr>
+    {% for field in form %}
+    <td style="vertical-align: top;">
+      <div class="control-group {% if field.errors %}error{% endif %}">
+        <label class="control-label" for="id_ra">{{field.label}}</label>
+        <div class="controls">
+          {{ field }}
+          {% if field.errors %}
+          <span class="help-inline">{{ field.errors }}</span>
+          {% endif %}
+        </div>
+      </div>
+    </td>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td><input class="btn btn-primary" type="submit" value="Filter" /></td>
+    <td colspan="2" style="text-align:right">Input in decimal degrees.</td>
+  </tr>
+</table>
 </form>
 
 <table class="table table-striped table-condensed">
