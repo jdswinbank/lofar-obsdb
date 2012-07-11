@@ -54,11 +54,17 @@ class Observation(models.Model):
         ('LBA_X', 'LBA_X'),
         ('LBA_Y', 'LBA_Y')
     )
+    CLOCK_CHOICES = (
+        (160, "160 MHz"),
+        (200, "200 MHz")
+    )
+
     obsid = models.CharField(max_length=10, unique=True)
     stations = models.ManyToManyField(Station)
     antennaset = models.CharField(max_length=15, choices=ANTENNASET_CHOICES)
     start_time = models.DateTimeField()
     duration = models.IntegerField() # Always an integral number of seconds?
+    clock = models.IntegerField(choices=CLOCK_CHOICES)
     parset = models.TextField()
 
     def __unicode__(self):
@@ -67,10 +73,20 @@ class Observation(models.Model):
     class Meta:
         ordering = ['start_time']
 
+class Subband(models.Model):
+    number = models.IntegerField(unique=True)
+
+    def __unicode__(self):
+        return str(self.number)
+
+    class Meta:
+        ordering = ['number']
+
 class Beam(models.Model):
     observation = models.ForeignKey(Observation)
     beam = models.IntegerField()
     field = models.ForeignKey(Field)
+    subbands = models.ManyToManyField(Subband)
 
     def __unicode__(self):
         return self.observation.obsid + " beam " + str(self.beam)
