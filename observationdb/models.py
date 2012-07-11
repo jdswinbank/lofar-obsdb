@@ -14,6 +14,7 @@ class Field(models.Model):
     ra = models.FloatField()
     dec = models.FloatField()
     survey = models.ForeignKey(Survey)
+    calibrator = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.name
