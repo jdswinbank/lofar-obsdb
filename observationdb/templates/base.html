@@ -1,0 +1,107 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>MSSS Observation Database</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="John Swinbank">
+
+    <link href="{% static "css/bootstrap.css" %}" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
+    <link href="{% static "css/bootstrap-responsive.css" %}" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+<!--          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+-->
+          <a class="brand" href="#">MSSS Observation Database</a>
+          <!--<div class="nav-collapse">
+            <ul class="nav">
+              <li class="active"><a href="#">Home</a></li>
+              <li><a href="#about">About</a></li>
+              <li><a href="#contact">Contact</a></li>
+            </ul>
+          </div>--><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+      {% block contents %}
+      <div class="hero-unit">
+        <h1>Welcome</h1>
+        <p>This site marshalls information about data which has been taken for
+        MSSS, the <a href="http://www.lofar.org">LOFAR</a> Multifrequency
+        Snapshot Sky Survey. Use the links below to get started.</p>
+<!--        <p><a class="btn btn-primary btn-large">Learn more &raquo;</a></p>
+-->
+      </div>
+
+      <div class="row">
+        <div class="span4">
+          <h2>Surveys</h2>
+           <p>The following survey{{ survey_list.count|pluralize:" is,s are" }} available:</p>
+           <ul>
+             {% for survey in survey_list %}
+             <li><a href="/survey/{{ survey.pk }}/">{{ survey.name }}</a></li>
+             {% endfor %}
+           </ul>
+        </div>
+        <div class="span4">
+          <h2>Fields</h2>
+           <p>The database covers {{ n_fields }} field{{ n_fields|pluralize }} ({{ n_targets }}
+           target and {{ n_calibrators }} calibrator) over all surveys.</p>
+          <p><a class="btn" href="/field/">View details &raquo;</a></p>
+       </div>
+        <div class="span4">
+          <h2>Observations</h2>
+          <p>Details of {{ n_observations }} separate
+          observation{{n_observations|pluralize }} are available.</p>
+          <p><a class="btn" href="/observation/">View details &raquo;</a></p>
+        </div>
+      </div>
+      {% endblock %} <!-- contents -->
+
+      <hr>
+
+      <footer>
+        <p>&copy; John Swinbank 2012</p>
+      </footer>
+
+    </div> <!-- /container -->
+
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--    <script src="{% static "js/jquery.js" %}"></script>
+    <script src="{% static "js/bootstrap-transition.js" %}"></script>
+    <script src="{% static "js/bootstrap-alert.js" %}"></script>
+    <script src="{% static "js/bootstrap-modal.js" %}"></script>
+    <script src="{% static "js/bootstrap-dropdown.js" %}"></script>
+    <script src="{% static "js/bootstrap-scrollspy.js" %}"></script>
+    <script src="{% static "js/bootstrap-tab.js" %}"></script>
+    <script src="{% static "js/bootstrap-tooltip.js" %}"></script>
+    <script src="{% static "js/bootstrap-popover.js" %}"></script>
+    <script src="{% static "js/bootstrap-button.js" %}"></script>
+    <script src="{% static "js/bootstrap-collapse.js" %}"></script>
+    <script src="{% static "js/bootstrap-carousel.js" %}"></script>
+    <script src="{% static "js/bootstrap-typeahead.js" %}"></script>
+-->
+
+  </body>
+</html>

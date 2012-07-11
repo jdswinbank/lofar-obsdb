@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, include, url
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, TemplateView
 from django.contrib import admin
 
 from observationdb.models import Survey
@@ -23,7 +23,10 @@ urlpatterns = patterns('',
 
 
 #    url(r'^surveys/$', 'observationdb.views.surveys'),
-    url(r'^$',
+    url(r'^$', 'observationdb.views.intro'),
+
+
+    url(r'^survey/$',
         ListView.as_view(
             queryset=Survey.objects.all(),
             context_object_name='survey_list',

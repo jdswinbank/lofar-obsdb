@@ -6,6 +6,19 @@ from django.db.models import Min, Max, Count
 from observationdb.models import Survey, Field, Observation
 from observationdb.forms import PositionSearchForm, FieldFilterForm
 
+def intro(request):
+    return render_to_response(
+        'base.html',
+        {
+            'n_surveys': Survey.objects.count(),
+            'survey_list': Survey.objects.all(),
+            'n_fields': Field.objects.count(),
+            'n_targets': Field.objects.filter(calibrator=False).count(),
+            'n_calibrators': Field.objects.filter(calibrator=True).count(),
+            'n_observations': Observation.objects.count()
+            }
+    )
+
 def survey_summary(request, pk):
     s = Survey.objects.get(pk=pk)
     n_beams = s.field_set.aggregate(Count('beam'))['beam__count']
