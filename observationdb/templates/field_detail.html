@@ -35,7 +35,7 @@ occasions.</p>
   <tr>
     <td><a href="/observation/{{ beam.observation.pk }}/">{{ beam.observation.obsid }}</a></td>
     <td>{{ beam.beam }}</td>
-    <td>{{ beam.observation.start_time }}</td>
+    <td>{{ beam.observation.start_time|date:"Y-m-d H:i:s" }}</td>
     <td>{{ beam.observation.duration }}</td>
   </tr>
   {% endfor %}

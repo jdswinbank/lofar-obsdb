@@ -5,14 +5,22 @@
 <table>
   <tr>
     <th>Start Time</th>
-    <td>{{ observation.start_time }}</td>
+    <td>{{ observation.start_time|date:"Y-m-d H:i:s" }}</td>
   </tr>
     <th>Duration</th>
     <td>{{ observation.duration }}</td>
   </tr>
   </tr>
     <th>Antenna Set</th>
-    <td>{{ observation.antennaset}}</td>
+    <td>{{ observation.antennaset }}</td>
+  </tr>
+  </tr>
+    <th>Stations</th>
+    <td>
+      {% for station in observation.stations.all %}
+        {{ station.name }}{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    </td>
   </tr>
   {% for beam in observation.beam_set.all %}
   <tr>
