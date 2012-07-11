@@ -71,7 +71,6 @@ class Beam(models.Model):
     observation = models.ForeignKey(Observation)
     beam = models.IntegerField()
     field = models.ForeignKey(Field)
-    calibrator = models.ForeignKey('self', blank=True, related_name='+', null=True)
 
     def __unicode__(self):
         return self.observation.obsid + " beam " + str(self.beam)
