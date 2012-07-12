@@ -1,5 +1,6 @@
 import math
 
+from django.http import Http404
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -13,12 +14,15 @@ def intro(request):
     if request.method == 'POST':
         form = LookupForm(request.POST)
         if form.is_valid():
-            if "field" in request.POST:
-                field = Field.objects.get(name=form.cleaned_data['target'])
-                return HttpResponseRedirect(reverse('field_detail', args=(field.id,)))
-            elif "obs" in request.POST:
-                obs = Observation.objects.get(obsid=form.cleaned_data['target'])
-                return HttpResponseRedirect(reverse('observation_detail', args=(obs.id,)))
+            try:
+                if "field" in request.POST:
+                    field = Field.objects.get(name=form.cleaned_data['target'])
+                    return HttpResponseRedirect(reverse('field_detail', args=(field.id,)))
+                elif "obs" in request.POST:
+                    obs = Observation.objects.get(obsid=form.cleaned_data['target'])
+                    return HttpResponseRedirect(reverse('observation_detail', args=(obs.id,)))
+            except:
+                raise Http404
 
     return render_to_response(
         'base.html',
