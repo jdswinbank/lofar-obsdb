@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>MSSS Observation Database</title>
+    <title>LOFAR Observation Database</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="John Swinbank">
 
@@ -30,12 +30,13 @@
             <span class="icon-bar"></span>
           </a>
 -->
-          <a class="brand" href="/">MSSS Observation Database</a>
+          <a class="brand" href="/">LOFAR Observation Database</a>
           <!--<div class="nav-collapse">
             <ul class="nav">
-              <li class="active"><a href="#">Home</a></li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#contact">Contact</a></li>
+              <li class="active"><a href="/">Home</a></li>
+              <li><a href="/survey/">Surveys</a></li>
+              <li><a href="/field/">Fields</a></li>
+              <li><a href="/observation">Observations</a></li>
             </ul>
           </div>--><!--/.nav-collapse -->
         </div>
@@ -47,9 +48,11 @@
       {% block contents %}
       <div class="hero-unit">
         <h1>Welcome</h1>
-        <p>This site marshalls information about data which has been taken for
-        MSSS, the <a href="http://www.lofar.org">LOFAR</a> Multifrequency
-        Snapshot Sky Survey. Use the links below to get started.</p>
+        <p>This site marshalls information about interferometric data which
+        has been recorded by <a href="http://www.lofar.org">LOFAR</a>.
+        Primarily, it aims to support the ongoing MSSS (&quot;Multifrequency
+        Snapshot Sky Survey&quot;) commissioning effort.</p>
+        <p>Use the links below to get started.</p>
 <!--        <p><a class="btn btn-primary btn-large">Learn more &raquo;</a></p>
 -->
       </div>
@@ -57,7 +60,7 @@
       <div class="row">
         <div class="span4">
           <h2>Surveys</h2>
-           <p>The following survey{{ survey_list.count|pluralize:" is,s are" }} available:</p>
+           <p>Data on the following survey{{ survey_list.count|pluralize:" is,s are" }} available:</p>
            <ul>
              {% for survey in survey_list %}
              <li><a href="/survey/{{ survey.pk }}/">{{ survey.name }}</a></li>
@@ -66,8 +69,8 @@
         </div>
         <div class="span4">
           <h2>Fields</h2>
-           <p>The database covers {{ n_fields }} field{{ n_fields|pluralize }} ({{ n_targets }}
-           target and {{ n_calibrators }} calibrator) over all surveys.</p>
+           <p>The database includes {{ n_fields }} field{{ n_fields|pluralize }} ({{ n_targets }}
+           target and {{ n_calibrators }} calibrator).</p>
           <p><a class="btn" href="/field/">View details &raquo;</a></p>
        </div>
         <div class="span4">
