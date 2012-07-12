@@ -3,6 +3,9 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 from observationdb.models import Survey
 
+class LookupForm(forms.Form):
+    target = forms.CharField(max_length=100)
+
 class FieldFilterForm(forms.Form):
     ra = forms.FloatField(required=False, label="Right Ascension",
         validators=[MaxValueValidator(360), MinValueValidator(0)],

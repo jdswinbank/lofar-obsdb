@@ -1,14 +1,25 @@
 import math
 
-from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.db.models import Min, Max, Count
+from django.core.urlresolvers import reverse
 
 from observationdb.models import Survey, Field, Observation
-from observationdb.forms import FieldFilterForm
+from observationdb.forms import LookupForm, FieldFilterForm
 
 def intro(request):
+    if request.method == 'POST':
+        form = LookupForm(request.POST)
+        if form.is_valid():
+            if "field" in request.POST:
+                field = Field.objects.get(name=form.cleaned_data['target'])
+                return HttpResponseRedirect(reverse('field_detail', args=(field.id,)))
+            elif "obs" in request.POST:
+                obs = Observation.objects.get(obsid=form.cleaned_data['target'])
+                return HttpResponseRedirect(reverse('observation_detail', args=(obs.id,)))
+
     return render_to_response(
         'base.html',
         {
@@ -17,8 +28,9 @@ def intro(request):
             'n_fields': Field.objects.count(),
             'n_targets': Field.objects.filter(calibrator=False).count(),
             'n_calibrators': Field.objects.filter(calibrator=True).count(),
-            'n_observations': Observation.objects.count()
-            }
+            'n_observations': Observation.objects.count(),
+        },
+        context_instance=RequestContext(request)
     )
 
 def survey_summary(request, pk):
@@ -31,14 +43,6 @@ def survey_summary(request, pk):
         'survey_detail.html',
         {'survey': s, 'n_beams': n_beams, 'start_time': start_time, 'stop_time': stop_time}
     )
-
-def observation_detail(request, pk):
-    o = Observation.objects.get(pk=pk)
-    return render_to_response('observation_detail.html', {'observation': o})
-
-def field_detail(request, pk):
-    f = Field.objects.get(pk=pk)
-    return render_to_response('field_detail.html', {'field': f})
 
 def field_list(request):
     fields = Field.objects.all()

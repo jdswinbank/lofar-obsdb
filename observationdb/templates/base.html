@@ -82,6 +82,16 @@
       </div>
       {% endblock %} <!-- contents -->
 
+    <div class="row" style="text-align: center">
+       <p>Or, jump straight to your data:<p/>
+       <form class="form-search" method="post" action="/">
+         {% csrf_token %}
+         <input id="id_target" type="text" name="target" maxlength="100" class="input-medium search-query" />
+         <button type="submit" class="btn btn-primary" name="field">Field</button>
+         <button type="submit" class="btn btn-success" name="obs">Observation</button>
+       </form>
+     </div>
+
       <hr>
 
       <footer>
