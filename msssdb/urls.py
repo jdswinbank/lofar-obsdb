@@ -1,8 +1,9 @@
 from django.conf.urls import patterns, include, url
 from django.views.generic import ListView, TemplateView
+from django.views.generic.simple import redirect_to
 from django.contrib import admin
 
-from observationdb.models import Survey
+from observationdb.models import Survey, Observation
 
 admin.autodiscover()
 
@@ -35,9 +36,18 @@ urlpatterns = patterns('',
     ),
     url(r'^survey/(?P<pk>\d+)/$', 'observationdb.views.survey_summary'),
 
+    url(r'^observation/$', redirect_to, {'url': '/observation/page1'}),
+    url(r'^observation/page(?P<page>[0-9]+)/$',
+        ListView.as_view(
+            queryset=Observation.objects.all(),
+            context_object_name='obs_list',
+            template_name='observation_list.html',
+            paginate_by=200,
+        ),
+        name="obs_list"
+    ),
     url(r'^observation/(?P<pk>\d+)/$', 'observationdb.views.observation_detail'),
 
     url(r'^field/(?P<pk>\d+)/$', 'observationdb.views.field_detail'),
     url(r'^field/$', 'observationdb.views.field_list'),
-
 )
