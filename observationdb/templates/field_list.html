@@ -4,8 +4,7 @@
 {% block contents %}
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<form action="/field/" method="post" class="well">
-{% csrf_token %}
+<form action="/field/" method="get" class="well">
 <h2>Filter Listing <small>Currently displaying {{ field_list|length }} fields</small></h2>
 
 <table>

@@ -42,9 +42,11 @@ def field_detail(request, pk):
 
 def field_list(request):
     fields = Field.objects.all()
-    if request.method == 'POST' and not 'clear' in request.POST:
-        form = FieldFilterForm(request.POST)
+    if request.method == 'GET' and not 'clear' in request.GET:
+        form = FieldFilterForm(request.GET)
         if form.is_valid():
+            if form.cleaned_data['survey']:
+                fields = fields.filter(survey_id=form.cleaned_data['survey'])
             ra = form.cleaned_data['ra']
             dec = form.cleaned_data['dec']
             radius = form.cleaned_data['radius']
@@ -52,6 +54,7 @@ def field_list(request):
                 # Fudge factor to account for floating point rouding errors:
                 # dec of 90 with 90 degree search doesn't quite hit dec of 0!
                 fields = filter(lambda x: x.distance_from(math.radians(ra), math.radians(dec)) <= math.radians(radius) + 1e-5, fields)
+
     else:
         form = FieldFilterForm()
 
