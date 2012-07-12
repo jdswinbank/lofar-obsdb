@@ -6,7 +6,7 @@
   <h1>{{ survey.name }}</h1>
 
   <p>This survey consists of {{ survey.field_set.count }} fields which have
-  been observed a total of {{ n_beams }} times{% if n_times > 0 %}
+  been observed a total of {{ n_beams }} times{% if n_beams > 0 %}
   between {{ start_time|date:"j N Y" }} and {{ stop_time|date:"j N Y" }}
   {% endif %}.</p>
 
