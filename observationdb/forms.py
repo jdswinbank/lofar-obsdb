@@ -11,7 +11,7 @@ class FieldFilterForm(forms.Form):
         validators=[MaxValueValidator(360), MinValueValidator(0)],
         widget=forms.TextInput(attrs={'class':'input-small'}))
     dec = forms.FloatField(required=False, label="Declination",
-        validators=[MaxValueValidator(90), MinValueValidator(0)],
+        validators=[MaxValueValidator(90), MinValueValidator(-90)],
         widget=forms.TextInput(attrs={'class':'input-small'}))
     radius = forms.FloatField(required=False, label="Search Radius",
         validators=[MaxValueValidator(360), MinValueValidator(0)],
