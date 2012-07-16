@@ -54,7 +54,7 @@ class Parset(object):
         return duration.seconds
 
     def stations(self):
-        return self.parset.get('Observation.existingStations').expand().getStringVector()
+        return self.parset.get('Observation.VirtualInstrument.stationList').expand().getStringVector()
 
     def subbands(self, beam):
         return self.parset.get('Observation.Beam[%d].subbandList' % beam).expand().getIntVector()
