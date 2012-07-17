@@ -1,16 +1,134 @@
 {% extends "base.html" %}
+{% load staticfiles %}
+{% load position %}
 
 {% block contents %}
 
 <div class="hero-unit">
   <h1>{{ survey.name }}</h1>
 
-  <p>This survey consists of {{ survey.field_set.count }} fields which have
-  been observed a total of {{ n_beams }} times{% if n_beams > 0 %}
+  <p>This survey consists of {{ survey.field_set.count }} fields of which
+  {{ n_observed }} ({{ percentage|floatformat }}%) have been observed a total of {{ n_beams }} times{% if n_beams > 0 %}
   between {{ start_time|date:"j N Y" }} and {{ stop_time|date:"j N Y" }}{% endif %}.</p>
 
   <p><a href="/field/?survey={{ survey.id }}" class="btn btn-primary btn-large">Show me the data &raquo;</a></p>
 
 </div>
 
+
+<div class="text-align:center">
+<table style="margin-left: auto;margin-right: auto">
+  <tr>
+    <td colspan="2">
+      <canvas id="map" style="z-index: 100; position: relative; border: 1px solid #333333; background-color: #000000;">
+      <p>Your browser does not support canvas.</p>
+      </canvas>
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align:center">
+      <form name="queryForm" class="form-search" method="get">
+        <select name='projectionType' id='projectionType' onchange="document.queryForm.submit()"></select>
+      </form>
+    </td>
+    <td style="text-align:center">
+      <p>Map based on code from <a href="https://code.google.com/p/projection-map/">this project</a>.</p>
+    </td>
+  </tr>
+</table>
+</div>
+
+<table style="visibility: hidden" border='0' id="MapToolbar" align='center' cellpadding=0 cellspacing=0 style='font-size:11pt;'><tr>
+   <td width='205'>
+   <div class="slider" id="slider-1" tabIndex="1">
+   <input class="slider-input" id="slider-input-1" name="slider-input-1"/></div>
+   </td>
+   <td width=25>
+   <image src='javascript/slider/play.gif' width='25' title='Spin' onClick="javascript:btnSpin_OnClick(this);">
+   </td>
+   <td width=110 align='left'>
+   &nbsp;Rotation: <div id='vRotation' style='display: inline;'>0</div>&deg;
+   </td>
+
+   <td width='205'>
+   <div class="slider" id="slider-2" tabIndex="1">
+   <input class="slider-input" id="slider-input-2" name="slider-input-2"/></div>
+   </td>
+   <td width=100 align='left'>
+   Zoom: <div id='vZoom' style='display: inline;'>10</div>
+   </td>
+
+   <td align='left' width='80'>
+   <input type=button value='Reset' onClick="javascript:useDefault();" title="Click to reset to default value">
+   </td>
+
+</table>
+
+
+<script type="text/javascript">
+
+fields = new Array();
+values = new Array();
+{% for field in field_list %}
+values ={ra_deg:"{{field.0|to_degrees}}", dec_deg:"{{field.1|to_degrees}}", filter:"{{field.2}}", selected:"0", field_size:"{{field_size}}"};
+fields[{{forloop.counter0}}] = values;
+{% endfor %}
+</script>
+
+<script type="text/javascript">
+
+    function getQueryVariable(variable) {
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split("=");
+            if (pair[0] == variable) {
+                return pair[1];
+            }
+        }
+        return '';
+    }
+
+
+    function addProjTypes() {
+        var projTypes = ['HammerProjection', 'SinusoidalProjection', 'MollweideProjection',
+                     'FlatProjection', 'NorthPoleProjection', 'SouthPoleProjection'];
+        var len = projTypes.length;
+        var s = document.getElementById('projectionType');
+        if (!s) { return; }
+        var i, o;
+        var p = getQueryVariable('projectionType');
+        for (i = 0; i < len; i++) {
+            o = document.createElement('option');
+            o.text = projTypes[i];
+            o.value = projTypes[i];
+            if (o.value == p) { o.selected = true; }
+            try {
+                s.add(o, null);
+            } catch (example) {
+                s.add(o, 0); // work in IE only.
+            }
+        }
+    }
+
+    addProjTypes();
+
+var projName = getQueryVariable('projectionType');
+if (projName == '') projName = "HammerProjection";
+
+var proj = new window[projName]();
+var projMap;
+
+window.onload = function() { projMap = new ProjectionMap(proj); };
+
+</script>
+
+{% endblock %}
+
+{% block javascript %}
+<script src="{% static "js/slider/range.js" %}"></script>
+<script src="{% static "js/slider/timer.js" %}"></script>
+<script src="{% static "js/slider/slider.js" %}"></script>
+<script src="{% static "js/hammer.js" %}"></script>
+<script src="{% static "js/map.js" %}"></script>
 {% endblock %}
