@@ -536,6 +536,7 @@ ProjectionMap.prototype.drawHammer = function( fields, pos_x, pos_y, delta_ra, z
         lamda1 = this.deg2rad( this.getLamda(fra + dra, delta_ra) );
         lamda2 = this.deg2rad( this.getLamda(fra - dra, delta_ra) );
         phi1 = this.deg2rad(fdec + ddec);
+        if (phi1>this.deg2rad(89)) {phi1 = this.deg2rad(89);}
         phi2 = this.deg2rad(fdec - ddec);
 
         // Corners. 
