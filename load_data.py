@@ -13,8 +13,10 @@ from observationdb.models import Observation
 from observationdb.models import Beam
 from observationdb.models import Subband
 
-calibrators = Field.objects.filter(calibrator=True)
-fields = Field.objects.all()
+SURVEY = "MSSS LBA"
+
+calibrators = Field.objects.filter(calibrator=True).filter(survey__name=SURVEY)
+fields = Field.objects.filter(survey__name=SURVEY)
 
 class Parset(object):
     def __init__(self, filename):
@@ -123,7 +125,7 @@ def check_for_low_dec(parsets):
 
 
 def upload_to_djangodb(parsets):
-    survey = Survey.objects.get(name="MSSS LBA")
+    survey = Survey.objects.get(name=SURVEY)
 
     for parset in parsets:
         obsid = os.path.basename(parset.filename).rstrip(".parset")
