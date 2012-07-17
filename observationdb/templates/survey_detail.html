@@ -92,6 +92,7 @@ fields[{{forloop.counter0}}] = values;
 
     function addProjTypes() {
         var projTypes = ['HammerProjection', 'NorthPoleProjection', 'SouthPoleProjection'];
+        var projNames = ['Hammer Projection', 'North Pole Projection', 'South Pole Projection'];
         var len = projTypes.length;
         var s = document.getElementById('projectionType');
         if (!s) { return; }
@@ -99,7 +100,7 @@ fields[{{forloop.counter0}}] = values;
         var p = getQueryVariable('projectionType');
         for (i = 0; i < len; i++) {
             o = document.createElement('option');
-            o.text = projTypes[i];
+            o.text = projNames[i];
             o.value = projTypes[i];
             if (o.value == p) { o.selected = true; }
             try {
