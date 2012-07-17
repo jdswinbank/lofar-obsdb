@@ -41,10 +41,14 @@ def survey_summary(request, pk):
     s = Survey.objects.get(pk=pk)
     n_beams = s.field_set.aggregate(Count('beam'))['beam__count']
     n_observed = s.field_set.annotate(num_beams=Count('beam')).filter(num_beams__gt=0).count()
-    percentage = 100*float(n_observed)/s.field_set.count()
+    if s.field_set.count() > 0:
+        percentage = 100*float(n_observed)/s.field_set.count()
+        field_size = math.degrees(max(abs(s.field_set.all()[0].ra - s.field_set.all()[1].ra), abs(s.field_set.all()[0].dec - s.field_set.all()[1].dec)))/2
+    else:
+        percentage = 0
+        field_size = 0
     start_time = s.field_set.aggregate(Min('beam__observation__start_time')).values()[0]
     stop_time = s.field_set.aggregate(Max('beam__observation__start_time')).values()[0]
-    field_size = math.degrees(max(abs(s.field_set.all()[0].ra - s.field_set.all()[1].ra), abs(s.field_set.all()[0].dec - s.field_set.all()[1].dec)))/2
     field_list = [
         (f.ra, f.dec, "g" if f.beam_set.count() else "r")
         for f in s.field_set.filter(calibrator=False)
