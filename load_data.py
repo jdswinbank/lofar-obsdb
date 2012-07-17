@@ -15,8 +15,8 @@ from observationdb.models import Subband
 
 SURVEY = "MSSS LBA"
 
-calibrators = Field.objects.filter(calibrator=True).filter(survey__name=SURVEY)
 fields = Field.objects.filter(survey__name=SURVEY)
+calibrators = fields.filter(calibrator=True)
 
 class Parset(object):
     def __init__(self, filename):
@@ -24,21 +24,24 @@ class Parset(object):
         self.filename = filename
         self.allocated = False
 
-    def field_name(self, beam, threshold=0.5):
+    def field_name(self, beam, threshold=0.05):
         ra = self.get_float("Observation.Beam[%d].angle1" % beam)
         dec = self.get_float("Observation.Beam[%d].angle2" % beam)
-        closest_field = min(fields, key=lambda x: x.distance_from(ra, dec))
-        if closest_field.distance_from(ra, dec) <= threshold:
-            return closest_field.name
+        local_fields = fields.filter(dec__gte=dec-threshold, dec__lte=dec+threshold)
+        if local_fields:
+            closest_field = min(local_fields, key=lambda x: x.distance_from(ra, dec))
+            if closest_field.distance_from(ra, dec) <= threshold:
+                return closest_field.name
 
-    def is_calibrator(self, threshold=0.1):
+    def is_calibrator(self, threshold=0.05):
         if self.get_int("Observation.nrBeams") == 1:
             ra = self.get_float("Observation.Beam[0].angle1")
             dec = self.get_float("Observation.Beam[0].angle2")
-
-            closest_calibrator = min(calibrators, key=lambda x: x.distance_from(ra, dec))
-            if closest_calibrator.distance_from(ra, dec) <= threshold:
-                return closest_calibrator.name
+            local_fields = calibrators.filter(dec__gte=dec-threshold, dec__lte=dec+threshold)
+            if local_fields:
+                closest_calibrator = min(local_fields, key=lambda x: x.distance_from(ra, dec))
+                if closest_calibrator.distance_from(ra, dec) <= threshold:
+                    return closest_calibrator.name
         return False
 
     def start_time(self):
@@ -132,7 +135,7 @@ def upload_to_djangodb(parsets):
         with open(parset.filename, 'r') as parset_file:
             parset_contents = parset_file.read()
 
-        observation = Observation(
+        observation = Observation.objects.create(
             obsid=obsid,
             antennaset=parset.get_string("Observation.antennaSet"),
             start_time=parset.start_time(),
@@ -140,7 +143,6 @@ def upload_to_djangodb(parsets):
             parset=parset_contents,
             clock=parset.clock()
         )
-        observation.save()
         observation.stations = Station.objects.filter(name__in=parset.stations())
         observation.save()
 
@@ -148,12 +150,11 @@ def upload_to_djangodb(parsets):
             field_name = parset.field_name(beam_number)
             if field_name:
                 field = Field.objects.get(name=field_name)
-                beam = Beam(
+                beam = Beam.objects.create(
                     observation=observation,
                     field=field,
                     beam=beam_number
                 )
-                beam.save()
                 beam.subbands = Subband.objects.filter(number__in=parset.subbands(beam_number))
                 beam.save()
             else:
@@ -182,17 +183,17 @@ if __name__ == "__main__":
                 upload_to_djangodb(parsets[idx:idx+72])
                 for pset in  parsets[idx:idx+72]:
                     pset.allocated = True
-                    if pset.is_calibrator():
-                        print pset.filename, pset.is_calibrator(), pset.start_time()
-                    else:
-                        print pset.filename, pset.field_name(0), pset.field_name(1), pset.field_name(2), pset.start_time()
+#                    if pset.is_calibrator():
+#                        print pset.filename, pset.is_calibrator(), pset.start_time()
+#                    else:
+#                        print pset.filename, pset.field_name(0), pset.field_name(1), pset.field_name(2), pset.start_time()
         if not parset.allocated and len(parsets[idx:idx+54]) == 54:
             if check_for_low_dec(parsets[idx:idx+54]):
                 print "Got a run of 27 calibrators starting at %s %d" % (parset.filename, idx)
                 upload_to_djangodb(parsets[idx:idx+54])
                 for pset in  parsets[idx:idx+54]:
                     pset.allocated = True
-                    if pset.is_calibrator():
-                        print pset.filename, pset.is_calibrator(), pset.start_time()
-                    else:
-                        print pset.filename, pset.field_name(0), pset.field_name(1), pset.field_name(2), pset.start_time()
+#                    if pset.is_calibrator():
+#                        print pset.filename, pset.is_calibrator(), pset.start_time()
+#                    else:
+#                        print pset.filename, pset.field_name(0), pset.field_name(1), pset.field_name(2), pset.start_time()
