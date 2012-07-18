@@ -19,8 +19,7 @@ def intro(request):
                     field = Field.objects.get(name=form.cleaned_data['target'])
                     return HttpResponseRedirect(reverse('field_detail', args=(field.id,)))
                 elif "obs" in request.POST:
-                    obs = Observation.objects.get(obsid=form.cleaned_data['target'])
-                    return HttpResponseRedirect(reverse('observation_detail', args=(obs.id,)))
+                    return HttpResponseRedirect(reverse('observation_detail', args=(form.cleaned_data['target'],)))
             except:
                 raise Http404
 
