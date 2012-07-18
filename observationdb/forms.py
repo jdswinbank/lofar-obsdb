@@ -17,7 +17,7 @@ class FieldFilterForm(forms.Form):
         validators=[MaxValueValidator(360), MinValueValidator(0)],
         widget=forms.TextInput(attrs={'class':'input-small'}))
     survey = forms.ChoiceField(
-        choices=[("", "")] + [(s.id, s.name) for s in Survey.objects.all()],
+        choices=[("", "")] + [(s.name, s.name) for s in Survey.objects.all()],
         required=False
     )
 #    targets = forms.BooleanField(initial=True, required=False, label="Show target fields")

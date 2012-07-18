@@ -4,7 +4,8 @@ from pyrap.measures import measures
 EPOCH = "J2000"
 
 class Survey(models.Model):
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100, primary_key=True)
+    description = models.TextField(blank=True)
 
     def __unicode__(self):
         return self.name
@@ -14,7 +15,8 @@ class Survey(models.Model):
         return ('observationdb.views.survey_summary', [str(self.name)])
 
 class Field(models.Model):
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100)
+    description = models.CharField(max_length=100, blank=True)
     ra = models.FloatField()
     dec = models.FloatField()
     survey = models.ForeignKey(Survey)
@@ -63,7 +65,7 @@ class Observation(models.Model):
         (200, "200 MHz")
     )
 
-    obsid = models.CharField(max_length=10, unique=True)
+    obsid = models.CharField(max_length=10, primary_key=True)
     stations = models.ManyToManyField(Station)
     antennaset = models.CharField(max_length=15, choices=ANTENNASET_CHOICES)
     start_time = models.DateTimeField()

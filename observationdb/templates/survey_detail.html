@@ -6,6 +6,7 @@
 
 <div class="hero-unit">
   <h1>{{ survey.name }}</h1>
+  <h2>{{ survey.description }}</h2>
 
   <p>This survey consists of {{ survey.field_set.count }} fields of which
   {{ n_observed }} ({{ percentage|floatformat }}%) have been observed a total of {{ n_beams }} times{% if n_beams > 0 %}

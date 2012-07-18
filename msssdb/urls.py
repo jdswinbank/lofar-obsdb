@@ -31,17 +31,17 @@ urlpatterns = patterns('',
             template_name='survey_list.html'
         )
     ),
-    url(r'^survey/(?P<pk>\d+)/$', 'observationdb.views.survey_summary'),
+    url(r'^survey/(?P<pk>.+)/$', 'observationdb.views.survey_summary'),
 
     url(r'^observation/$', redirect_to, {'url': '/observation/page1'}),
-    url(r'^observation/(?P<pk>\d+)/$',
+    url(r'^observation/(?P<pk>L\d+)/$',
         DetailView.as_view(
             model=Observation,
             template_name='observation_detail.html'
         ),
         name="observation_detail"
     ),
-    url(r'^observation/page(?P<page>[0-9]+)/$',
+    url(r'^observation/page(?P<page>\d+)/$',
         ListView.as_view(
             queryset=Observation.objects.all(),
             context_object_name='obs_list',
