@@ -41,12 +41,12 @@ class Field(models.Model):
         ).get_value("rad")
 
 class Station(models.Model):
+    idnumber = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=10, unique=True)
-    idnumber = models.IntegerField(unique=True)
+    description = models.CharField(max_length=100, blank=True)
     longitude = models.FloatField()
     latitude = models.FloatField()
-    height = models.FloatField()
-    location = models.CharField(max_length=100, blank=True)
+    altitude = models.FloatField()
 
     def __unicode__(self):
         return self.name
