@@ -56,16 +56,16 @@ class Station(models.Model):
 
 class Observation(models.Model):
     ANTENNASET_CHOICES = (
-        ('HBA_DUAL', 'HBA_DUAL'),
-        ('HBA_DUAL_INNER', 'HBA_DUAL_INNER'),
-        ('HBA_JOINED', 'HBA_JOINED'),
-        ('HBA_ONE', 'HBA_ONE'),
-        ('HBA_ZERO', 'HBA_ZERO'),
-        ('HBA_ZERO_INNER', 'HBA_ZERO_INNER'),
-        ('LBA_INNER', 'LBA_INNER'),
-        ('LBA_OUTER', 'LBA_OUTER'),
-        ('LBA_X', 'LBA_X'),
-        ('LBA_Y', 'LBA_Y')
+        ("HBA_DUAL", "HBA_DUAL"),
+        ("HBA_DUAL_INNER", "HBA_DUAL_INNER"),
+        ("HBA_JOINED", "HBA_JOINED"),
+        ("HBA_ONE", "HBA_ONE"),
+        ("HBA_ZERO", "HBA_ZERO"),
+        ("HBA_ZERO_INNER", "HBA_ZERO_INNER"),
+        ("LBA_INNER", "LBA_INNER"),
+        ("LBA_OUTER", "LBA_OUTER"),
+        ("LBA_X", "LBA_X"),
+        ("LBA_Y", "LBA_Y")
     )
     CLOCK_CHOICES = (
         (160, "160 MHz"),
@@ -80,6 +80,10 @@ class Observation(models.Model):
         ("LBA_30_70", "30-70 MHz"),
         ("LBA_30_90", "30-90 MHz")
     )
+    ARCHIVE_CHOICES = (
+        ("SARA", "SARA"),
+        ("Target", "Target")
+    )
 
     obsid = models.CharField(max_length=10, primary_key=True)
     stations = models.ManyToManyField(Station)
@@ -88,6 +92,7 @@ class Observation(models.Model):
     duration = models.IntegerField() # Always an integral number of seconds?
     clock = models.IntegerField(choices=CLOCK_CHOICES)
     filter = models.CharField(max_length=15, choices=FILTER_CHOICES)
+    archive = models.CharField(max_length=15, choices=ARCHIVE_CHOICES, blank=True)
     parset = models.TextField()
 
     def __unicode__(self):
