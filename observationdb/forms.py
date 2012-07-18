@@ -16,9 +16,8 @@ class FieldFilterForm(forms.Form):
     radius = forms.FloatField(required=False, label="Search Radius",
         validators=[MaxValueValidator(360), MinValueValidator(0)],
         widget=forms.TextInput(attrs={'class':'input-small'}))
-    survey = forms.ChoiceField(
-        choices=[("", "")] + [(s.name, s.name) for s in Survey.objects.all()],
-        required=False
+    survey = forms.ModelChoiceField(
+        queryset=Survey.objects.all(), required=False, empty_label=""
     )
 #    targets = forms.BooleanField(initial=True, required=False, label="Show target fields")
 #    calibrators = forms.BooleanField(initial=True, required=False, label="Show calibrator fields")
