@@ -51,6 +51,9 @@ class Station(models.Model):
     def __unicode__(self):
         return self.name
 
+    class Meta:
+        ordering = ['name']
+
 class Observation(models.Model):
     ANTENNASET_CHOICES = (
         ('HBA_DUAL', 'HBA_DUAL'),
