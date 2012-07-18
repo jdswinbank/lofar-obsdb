@@ -37,7 +37,10 @@ def intro(request):
     )
 
 def survey_summary(request, pk):
-    s = Survey.objects.get(pk=pk)
+    try:
+        s = Survey.objects.get(pk=pk)
+    except DoesNotExist:
+        raise Http404
     n_beams = s.field_set.aggregate(Count('beam'))['beam__count']
     n_observed = s.field_set.annotate(num_beams=Count('beam')).filter(num_beams__gt=0).count()
     if s.field_set.count() > 0:
