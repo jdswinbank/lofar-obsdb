@@ -162,6 +162,11 @@ def upload_to_djangodb(parsets):
 
 
 if __name__ == "__main__":
+    if not Subband.objects.count() == 512:
+        Subband.objects.bulk_create(
+            [Subband(number=number) for number in xrange(513)]
+        )
+
     filenames = glob.glob("/home/jds/tmp/parsets/L*.parset")
     parsets = load_parsets(filenames)
     parsets = [
