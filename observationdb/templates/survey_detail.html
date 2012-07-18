@@ -12,7 +12,7 @@
   {{ n_observed }} ({{ percentage|floatformat }}%) have been observed a total of {{ n_beams }} times{% if n_beams > 0 %}
   between {{ start_time|date:"j N Y" }} and {{ stop_time|date:"j N Y" }}{% endif %}.</p>
 
-  <p><a href="/field/?survey={{ survey.id }}" class="btn btn-primary btn-large">Show me the data &raquo;</a></p>
+  <p><a href="/field/?survey={{ survey.name }}" class="btn btn-primary btn-large">Show me the data &raquo;</a></p>
 
 </div>
 
