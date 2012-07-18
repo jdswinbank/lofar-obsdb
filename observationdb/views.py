@@ -43,7 +43,13 @@ def survey_summary(request, pk):
     n_observed = s.field_set.annotate(num_beams=Count('beam')).filter(num_beams__gt=0).count()
     if s.field_set.count() > 0:
         percentage = 100*float(n_observed)/s.field_set.count()
-        field_size = math.degrees(max(abs(s.field_set.all()[0].ra - s.field_set.all()[1].ra), abs(s.field_set.all()[0].dec - s.field_set.all()[1].dec)))/2
+
+        # Assuming data is on a regular grid, we set the size of the grid
+        # cells equal to whichever is larger of the difference between the
+        # points in RA and dec space.
+        decs = s.field_set.values_list('dec').distinct().order_by('dec')[0:2]
+        ras = s.field_set.values_list('ra').distinct().order_by('ra')[0:2]
+        field_size = math.degrees(max(decs[1][0]-decs[0][0], ras[1][0]-ras[0][0]))/2
     else:
         percentage = 0
         field_size = 0
