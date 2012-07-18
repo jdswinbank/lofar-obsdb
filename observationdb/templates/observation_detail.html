@@ -36,6 +36,10 @@
           <td colspan="2">{{ observation.clock }} MHz</td>
         </tr>
         <tr>
+          <th>Filter</th>
+          <td colspan="2">{{ observation.get_filter_display }}</td>
+        </tr>
+        <tr>
           <th>Stations</th>
           <td colspan="2">
             {% for station in observation.stations.all %}

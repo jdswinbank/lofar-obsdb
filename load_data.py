@@ -141,7 +141,8 @@ def upload_to_djangodb(parsets):
             start_time=parset.start_time(),
             duration=parset.duration(),
             parset=parset_contents,
-            clock=parset.clock()
+            clock=parset.clock(),
+            filter=parset.get_string("Observation.bandFilter")
         )
         observation.stations = Station.objects.filter(name__in=parset.stations())
         observation.save()

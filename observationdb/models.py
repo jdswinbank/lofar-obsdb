@@ -68,6 +68,15 @@ class Observation(models.Model):
         (160, "160 MHz"),
         (200, "200 MHz")
     )
+    FILTER_CHOICES = (
+        ("HBA_110_190", "110-190 MHz"),
+        ("HBA_170_230", "170-230 MHz"),
+        ("HBA_210_250", "210-250 MHz"),
+        ("LBA_10_70", "10-70 MHz"),
+        ("LBA_10_90", "10-90 MHz"),
+        ("LBA_30_70", "30-70 MHz"),
+        ("LBA_30_90", "30-90 MHz")
+    )
 
     obsid = models.CharField(max_length=10, primary_key=True)
     stations = models.ManyToManyField(Station)
@@ -75,6 +84,7 @@ class Observation(models.Model):
     start_time = models.DateTimeField()
     duration = models.IntegerField() # Always an integral number of seconds?
     clock = models.IntegerField(choices=CLOCK_CHOICES)
+    filter = models.CharField(max_length=15, choices=FILTER_CHOICES)
     parset = models.TextField()
 
     def __unicode__(self):
@@ -88,7 +98,7 @@ class Observation(models.Model):
         ordering = ['start_time']
 
 class Subband(models.Model):
-    number = models.IntegerField(unique=True)
+    number = models.IntegerField(unique=True, primary_key=True)
 
     def __unicode__(self):
         return str(self.number)
