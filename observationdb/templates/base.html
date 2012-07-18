@@ -65,7 +65,7 @@
            <p>Data on the following survey{{ survey_list.count|pluralize:" is,s are" }} available:</p>
            <ul>
              {% for survey in survey_list %}
-             <li><a href="/survey/{{ survey.pk }}/">{{ survey.name }}</a></li>
+             <li><a href="{{ survey.get_absolute_url }}">{{ survey.name }}</a></li>
              {% endfor %}
            </ul>
         </div>
