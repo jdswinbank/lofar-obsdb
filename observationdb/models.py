@@ -106,4 +106,4 @@ class Beam(models.Model):
         return self.observation.obsid + " beam " + str(self.beam)
 
     class Meta:
-        ordering = ['observation__start_time']
+        ordering = ['observation__start_time', 'beam']
