@@ -47,7 +47,7 @@
         <tr>
           <th rowspan="2">Beam {{ beam.beam }}</th>
           <th>Target</th>
-          <td style="width: 100%"><a href="/field/{{ beam.field.pk }}/">{{ beam.field.name }}</a></td>
+          <td style="width: 100%"><a href="{{ beam.field.get_absolute_url }}">{{ beam.field.name }}</a></td>
         </tr>
         <tr>
           <th>Subbands</th>

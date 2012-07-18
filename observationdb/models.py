@@ -25,6 +25,10 @@ class Field(models.Model):
     def __unicode__(self):
         return self.name
 
+    @models.permalink
+    def get_absolute_url(self):
+        return ('field_detail', [str(self.pk)])
+
     def distance_from(self, ra, dec):
         """
         Returns angular distance between self and ra, dec. All values are
@@ -75,6 +79,10 @@ class Observation(models.Model):
 
     def __unicode__(self):
         return self.obsid
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('observation_detail', [str(self.obsid)])
 
     class Meta:
         ordering = ['start_time']

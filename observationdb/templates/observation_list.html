@@ -36,12 +36,12 @@
   {% for obs in obs_list %}
 
   <tr>
-    <td><a href="/observation/{{ obs.pk }}/">{{ obs.obsid }}</a></td>
+    <td><a href="{{ obs.get_absolute_url }}">{{ obs.obsid }}</a></td>
     <td>{{ obs.start_time|date:"Y-n-d" }}</td>
     <td>{{ obs.duration }} s</td>
     <td>
     {% for beam in obs.beam_set.all %}
-      <a href="/field/{{ beam.field.pk }}/">{{ beam.field.name }}</a>{% if not forloop.last %},{% endif %}
+      <a href="{{ beam.field.get_absolute_url }}">{{ beam.field.name }}</a>{% if not forloop.last %},{% endif %}
     {% endfor %}
     </td>
   </tr>

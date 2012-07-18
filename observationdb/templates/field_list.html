@@ -53,7 +53,7 @@
   {% for field in field_list %}
 
   <tr>
-    <td><a href="/field/{{ field.pk }}/">{{ field.name }}</a></td>
+    <td><a href="{{ field.get_absolute_url }}">{{ field.name }}</a></td>
     <td>{{ field.ra|format_angle:"time" }}</td>
     <td>{{ field.dec|format_angle:"angle" }}</td>
     <td>{{ field.survey.name }}</td>
