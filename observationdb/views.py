@@ -6,6 +6,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.db.models import Min, Max, Count
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist
 
 from observationdb.models import Survey, Field, Observation
 from observationdb.forms import LookupForm, FieldFilterForm
@@ -39,7 +40,7 @@ def intro(request):
 def survey_summary(request, pk):
     try:
         s = Survey.objects.get(pk=pk)
-    except DoesNotExist:
+    except ObjectDoesNotExist:
         raise Http404
     n_beams = s.field_set.aggregate(Count('beam'))['beam__count']
     n_observed = s.field_set.annotate(num_beams=Count('beam')).filter(num_beams__gt=0).count()
