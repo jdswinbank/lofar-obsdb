@@ -103,7 +103,7 @@ def field_list(request):
     else:
         page = 1
 
-    paginator = Paginator(fields, 200)
+    paginator = Paginator(fields, 100)
     field_list = paginator.page(page)
 
     return render_to_response(
