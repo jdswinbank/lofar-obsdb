@@ -7,6 +7,7 @@ from django.template import RequestContext
 from django.db.models import Min, Max, Count
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator
 
 from observationdb.models import Survey, Field, Observation
 from observationdb.forms import LookupForm, FieldFilterForm
@@ -95,8 +96,18 @@ def field_list(request):
     else:
         form = FieldFilterForm()
 
+    queries = request.GET.copy()
+    if queries.has_key('page'):
+        page = int(queries['page'])
+        del queries['page']
+    else:
+        page = 1
+
+    paginator = Paginator(fields, 200)
+    field_list = paginator.page(page)
+
     return render_to_response(
         'field_list.html',
-        {'field_list': fields, 'form': form},
+        {'field_list': field_list, 'form': form, 'queries': queries},
         context_instance=RequestContext(request)
     )

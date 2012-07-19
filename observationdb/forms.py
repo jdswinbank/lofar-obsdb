@@ -17,10 +17,10 @@ class FieldFilterForm(forms.Form):
         validators=[MaxValueValidator(360), MinValueValidator(0)],
         widget=forms.TextInput(attrs={'class':'input-small'}))
     survey = forms.ModelChoiceField(
-        queryset=Survey.objects.all(), required=False, empty_label=""
-    )
-#    targets = forms.BooleanField(initial=True, required=False, label="Show target fields")
-#    calibrators = forms.BooleanField(initial=True, required=False, label="Show calibrator fields")
+        queryset=Survey.objects.all(), required=False, empty_label="",
+        widget=forms.Select(attrs={'class': 'input-medium'}))
+#    targets = forms.BooleanField(initial=True, required=False, label="Include targets")
+#    calibrators = forms.BooleanField(initial=True, required=False, label="Include calibrators")
 
 
     def clean(self):
