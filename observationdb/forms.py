@@ -9,16 +9,16 @@ class LookupForm(forms.Form):
 class FieldFilterForm(forms.Form):
     ra = forms.FloatField(required=False, label="Right Ascension",
         validators=[MaxValueValidator(360), MinValueValidator(0)],
-        widget=forms.TextInput(attrs={'class':'input-small'}))
+        widget=forms.TextInput(attrs={'style':'width: 100px'}))
     dec = forms.FloatField(required=False, label="Declination",
         validators=[MaxValueValidator(90), MinValueValidator(-90)],
-        widget=forms.TextInput(attrs={'class':'input-small'}))
+        widget=forms.TextInput(attrs={'style':'width: 100px'}))
     radius = forms.FloatField(required=False, label="Search Radius",
         validators=[MaxValueValidator(360), MinValueValidator(0)],
-        widget=forms.TextInput(attrs={'class':'input-small'}))
+        widget=forms.TextInput(attrs={'style':'width: 100px'}))
     survey = forms.ModelChoiceField(
-        queryset=Survey.objects.all(), required=False, empty_label="",
-        widget=forms.Select(attrs={'class': 'input-medium'}))
+        queryset=Survey.objects.all(), required=False, empty_label="[All Surveys]",
+        widget=forms.Select(attrs={'style': 'width: 110px'}))
 #    targets = forms.BooleanField(initial=True, required=False, label="Include targets")
 #    calibrators = forms.BooleanField(initial=True, required=False, label="Include calibrators")
 
