@@ -85,13 +85,19 @@ def field_list(request):
         if form.is_valid():
             if form.cleaned_data['survey']:
                 fields = fields.filter(survey_id=form.cleaned_data['survey'])
-            ra = form.cleaned_data['ra']
-            dec = form.cleaned_data['dec']
-            radius = form.cleaned_data['radius']
-            if not None in (ra, dec, radius):
-                # Fudge factor to account for floating point rouding errors:
+            try:
+                ra = math.radians(form.cleaned_data['ra'])
+                dec = math.radians(form.cleaned_data['dec'])
+                radius = math.radians(form.cleaned_data['radius'])
+                # Fudge factor of 1e-5 to account for floating point rouding errors:
                 # dec of 90 with 90 degree search doesn't quite hit dec of 0!
-                fields = filter(lambda x: x.distance_from(math.radians(ra), math.radians(dec)) <= math.radians(radius) + 1e-5, fields)
+                fields = filter(
+                    lambda x: x.distance_from(ra, dec) <= radius + 1e-5,
+                    fields.filter(dec__gte=dec-radius, dec__lte=dec+radius)
+                )
+            except TypeError:
+                # One of the above wasn't specified -- skip this filter.
+                pass
 
     else:
         form = FieldFilterForm()
