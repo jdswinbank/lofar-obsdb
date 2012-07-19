@@ -11,17 +11,19 @@
 
 <p>Refine the selection here. Angles should be entered in decimal degrees.</p>
 
+<div style="color: rgb(185, 74, 72);">
 {{ form.non_field_errors }}
+</div>
 
-<fieldset>
+<fieldset style="margin: auto;">
   {% for field in form %}
   <div class="control-group {% if field.errors %}error{% endif %}">
     <label class="control-label" style="width: 100px; text-align: left" for="id_{{field.name}}">{{field.label}}</label>
-    <div class="controls" style="margin-left: 120px">
+    <div class="controls" style="margin-left: 0px">
       {{ field }}
       {% if field.errors %}
         {% for error in field.errors %}
-          <span class="help-inline">{{ error }}</span>
+          <span class="help-inline" style="padding-left: 100px">{{ error }}</span>
         {% endfor %}
       {% endif %}
     </div>

@@ -29,6 +29,9 @@ class FieldFilterForm(forms.Form):
         dec = cleaned_data.get("dec")
         radius = cleaned_data.get("radius")
         if 0 < (ra, dec, radius).count(None) < 3:
-            raise forms.ValidationError("Please specify all of right ascension, declination and search radius")
+            if not "ra" in self.errors.keys()  \
+                or "dec" in self.errors.keys() \
+                or "radius" in self.errors.keys():
+                raise forms.ValidationError("Please specify all of right ascension, declination and search radius")
 
         return cleaned_data
