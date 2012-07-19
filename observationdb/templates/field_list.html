@@ -69,7 +69,7 @@
     <td>{{ field.ra|format_angle:"time" }}</td>
     <td>{{ field.dec|format_angle:"angle" }}</td>
     <td>{{ field.survey.name }}</td>
-    <td>{{ field.beam_set.all.count }}</td>
+    <td>{{ field.num_beams }}</td>
     <td>{% if field.calibrator %}<i class="icon-ok"></i>{% endif %}</td>
   </tr>
 

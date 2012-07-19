@@ -98,6 +98,15 @@ def field_list(request):
             except TypeError:
                 # One of the above wasn't specified -- skip this filter.
                 pass
+            fields = fields.annotate(num_beams=Count('beam'))
+            if not form.cleaned_data['sort_by']:
+                form.cleaned_data['sort_by'] = "name"
+            if form.cleaned_data['sort_by'] in ("name", "ra", "dec"):
+                fields = fields.order_by(form.cleaned_data['sort_by'])
+            elif form.cleaned_data['sort_by'] == "obs":
+                fields = fields.order_by('-num_beams')
+            if form.cleaned_data['reverse']:
+                fields = fields.reverse()
 
     else:
         form = FieldFilterForm()

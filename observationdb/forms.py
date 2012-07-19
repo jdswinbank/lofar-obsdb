@@ -18,10 +18,11 @@ class FieldFilterForm(forms.Form):
         widget=forms.TextInput(attrs={'style':'width: 100px'}))
     survey = forms.ModelChoiceField(
         queryset=Survey.objects.all(), required=False, empty_label="[All Surveys]",
-        widget=forms.Select(attrs={'style': 'width: 110px'}))
-#    targets = forms.BooleanField(initial=True, required=False, label="Include targets")
-#    calibrators = forms.BooleanField(initial=True, required=False, label="Include calibrators")
-
+        widget=forms.Select(attrs={'style': 'width: 120px'}))
+    sort_by = forms.ChoiceField(required=False, label="Sort By",
+        choices=(('name', 'Name'), ('ra', 'RA'), ('dec', "Dec"), ('obs', '# Observations')),
+        widget=forms.Select(attrs={'style': 'width: 120px'}))
+    reverse = forms.BooleanField(required=False, label="Reverse")
 
     def clean(self):
         cleaned_data = super(FieldFilterForm, self).clean()
