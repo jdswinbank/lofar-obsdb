@@ -16,3 +16,4 @@ python ${SCRIPT_DIR}/create_stations.py ${METADATA_DIR}/StationInfo.dat
 python ${SCRIPT_DIR}/create_survey.py "MSSS LBA" ${METADATA_DIR}/calibrators.lba.txt ${METADATA_DIR}/grid.lba.txt
 python ${SCRIPT_DIR}/create_survey.py "MSSS HBA" ${METADATA_DIR}/calibrators.hba.txt ${METADATA_DIR}/grid.hba.txt
 python ${SCRIPT_DIR}/load_data.py
+python ${SCRIPT_DIR}/mark_as_archived ${METADATA_DIR}/archived_data.txt
