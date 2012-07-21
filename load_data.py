@@ -15,33 +15,36 @@ from observationdb.models import Subband
 
 SURVEY = "MSSS LBA"
 
-fields = Field.objects.filter(survey__name=SURVEY)
-calibrators = fields.filter(calibrator=True)
-
 class Parset(object):
     def __init__(self, filename):
         self.parset = parameterset(filename)
         self.filename = filename
         self.allocated = False
 
-    def field_name(self, beam, threshold=0.05):
+    def get_field(self, beam, threshold=0.05):
         ra = self.get_float("Observation.Beam[%d].angle1" % beam)
         dec = self.get_float("Observation.Beam[%d].angle2" % beam)
-        local_fields = fields.filter(dec__gte=dec-threshold, dec__lte=dec+threshold)
-        if local_fields:
-            closest_field = min(local_fields, key=lambda x: x.distance_from(ra, dec))
-            if closest_field.distance_from(ra, dec) <= threshold:
-                return closest_field.name
+        try:
+            return Field.objects.near_position(
+                ra, dec, threshold
+            ).filter(
+                survey__name=SURVEY
+            ).order_by("distance")[0]
+        except:
+            pass
 
     def is_calibrator(self, threshold=0.05):
         if self.get_int("Observation.nrBeams") == 1:
             ra = self.get_float("Observation.Beam[0].angle1")
             dec = self.get_float("Observation.Beam[0].angle2")
-            local_fields = calibrators.filter(dec__gte=dec-threshold, dec__lte=dec+threshold)
-            if local_fields:
-                closest_calibrator = min(local_fields, key=lambda x: x.distance_from(ra, dec))
-                if closest_calibrator.distance_from(ra, dec) <= threshold:
-                    return closest_calibrator.name
+            try:
+                return Field.objects.near_position(
+                    ra, dec, threshold
+                ).filter(
+                    survey__name=SURVEY, calibrator=True
+                ).order_by("distance")[0].name
+            except:
+                pass
         return False
 
     def start_time(self):
@@ -148,9 +151,8 @@ def upload_to_djangodb(parsets):
         observation.save()
 
         for beam_number in range(parset.get_int("Observation.nrBeams")):
-            field_name = parset.field_name(beam_number)
-            if field_name:
-                field = Field.objects.get(name=field_name)
+            field = parset.get_field(beam_number)
+            if field:
                 beam = Beam.objects.create(
                     observation=observation,
                     field=field,
