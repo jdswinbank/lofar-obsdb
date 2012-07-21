@@ -20,7 +20,13 @@ class FieldFilterForm(forms.Form):
         queryset=Survey.objects.all(), required=False, empty_label="[All Surveys]",
         widget=forms.Select(attrs={'style': 'width: 120px'}))
     sort_by = forms.ChoiceField(required=False, label="Sort By",
-        choices=(('name', 'Name'), ('ra', 'RA'), ('dec', "Dec"), ('obs', '# Observations')),
+        choices=(
+            ('name', 'Name'),
+            ('ra', 'RA'),
+            ('dec', "Dec"),
+            ('dist', 'Distance'),
+            ('obs', '# Observations')
+        ),
         widget=forms.Select(attrs={'style': 'width: 120px'}))
     reverse = forms.BooleanField(required=False, label="Reverse")
 
@@ -34,5 +40,9 @@ class FieldFilterForm(forms.Form):
                 or "dec" in self.errors.keys() \
                 or "radius" in self.errors.keys():
                 raise forms.ValidationError("Please specify all of right ascension, declination and search radius")
+
+        if cleaned_data['sort_by'] == "dist" \
+            and not (ra and dec and radius):
+            raise forms.ValidationError("Please specify a target to sort by distance")
 
         return cleaned_data

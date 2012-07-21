@@ -8,6 +8,7 @@ from django.db.models import Min, Max, Count
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
+from django.db.models.query import QuerySet
 
 from observationdb.models import Survey, Field, Observation
 from observationdb.forms import LookupForm, FieldFilterForm
@@ -79,6 +80,7 @@ def survey_summary(request, pk):
     )
 
 def field_list(request):
+    fields = Field.objects.all()
     if request.method == 'GET' and not 'clear' in request.GET:
         form = FieldFilterForm(request.GET)
         if form.is_valid():
@@ -91,7 +93,7 @@ def field_list(request):
                 fields = Field.objects.near_position(ra, dec, radius+1e-5)
             except TypeError:
                 # One of the above wasn't specified -- skip this filter.
-                fields = Field.objects.all()
+                pass
 
             # Filter by survey
             if form.cleaned_data['survey']:
@@ -103,11 +105,17 @@ def field_list(request):
                 fields = fields.order_by(form.cleaned_data['sort_by'])
             elif form.cleaned_data['sort_by'] == "obs":
                 fields = fields.order_by('-num_beams')
+            elif form.cleaned_data['sort_by'] == "dist":
+                fields = sorted(fields, key=lambda x: x.distance)
             if form.cleaned_data['reverse']:
-                fields = fields.reverse()
+                # The semantics of reverse() are different for querysets and
+                # normal Python iterators.
+                if isinstance(fields, QuerySet):
+                    fields = fields.reverse()
+                else:
+                    fields.reverse()
 
     else:
-        fields = Field.objects.all()
         form = FieldFilterForm()
 
     queries = request.GET.copy()
