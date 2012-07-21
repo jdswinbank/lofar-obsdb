@@ -57,6 +57,9 @@ class Field(models.Model):
         """
         return acos(sin(dec)*sin(self.dec) + cos(dec)*cos(self.dec)*cos(ra-self.ra))
 
+    class Meta:
+        ordering = ['name']
+
 
 class Station(models.Model):
     idnumber = models.IntegerField(primary_key=True)
