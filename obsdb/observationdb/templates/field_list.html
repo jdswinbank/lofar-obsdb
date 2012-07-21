@@ -68,10 +68,10 @@
   <tr>
     <td><a href="{{ field.get_absolute_url }}">{{ field.name }}</a></td>
     <td>{{ field.ra|format_angle:"time" }}</td>
-    <td>{{ field.dec|format_angle:"angle" }}</td>
-    <td>{% if field.distance %}{{ field.distance|to_degrees|floatformat }}&deg;{% else %}-{% endif %}</td>
+    <td>{{ field.dec|format_angle:"dms" }}</td>
+    <td style="text-align: right; style="text-align: right;"">{% if field.distance %}{{ field.distance|to_degrees|floatformat }}&deg;{% endif %}</td>
     <td>{{ field.survey.name }}</td>
-    <td>{{ field.num_beams }}</td>
+    <td style="text-align: right;">{{ field.num_beams }}</td>
     <td>{% if field.calibrator %}<i class="icon-ok"></i>{% endif %}</td>
   </tr>
 
