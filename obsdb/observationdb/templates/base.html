@@ -59,7 +59,8 @@
       <div class="row">
         <div class="span4">
           <h2>Surveys</h2>
-           <p>Data on the following survey{{ survey_list.count|pluralize:" is,s are" }} available:</p>
+           <p>Data on the following survey{{ survey_list.count|pluralize }}
+           is available:</p>
            <ul>
              {% for survey in survey_list %}
              <li><a href="{{ survey.get_absolute_url }}">{{ survey.name }}</a></li>
@@ -75,7 +76,8 @@
         <div class="span4">
           <h2>Observations</h2>
           <p>Details of {{ n_observations }} separate
-          observation{{n_observations|pluralize }} are available.</p>
+          observation{{n_observations|pluralize }} are available.
+          {{ n_archived }} of them are stored in the LOFAR archive.</p>
           <p><a class="btn" href="/observation/">View details &raquo;</a></p>
         </div>
       </div>
