@@ -1,4 +1,4 @@
-# Django settings for msssdb project.
+# Django settings for obsdb project.
 import os
 BASE_DIR = os.path.dirname(__file__)
 
@@ -14,9 +14,10 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'msss.db'),
+        'NAME': os.path.join(BASE_DIR, 'obs.db'),
     }
 }
+
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -98,10 +99,10 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'msssdb.urls'
+ROOT_URLCONF = 'obsdb.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'msssdb.wsgi.application'
+WSGI_APPLICATION = 'obsdb.wsgi.application'
 
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates'),

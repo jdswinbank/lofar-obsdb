@@ -10,7 +10,7 @@ SCRIPT_DIR=${WORKING_DIR}/scripts
 METADATA_DIR=${WORKING_DIR}/metadata
 
 export PYTHONPATH=${WORKING_DIR}${PYTHONPATH:+:${PYTHONPATH}}
-export DJANGO_SETTINGS_MODULE="msssdb.settings"
+export DJANGO_SETTINGS_MODULE="obsdb.settings"
 
 python ${SCRIPT_DIR}/create_stations.py ${METADATA_DIR}/StationInfo.dat
 python ${SCRIPT_DIR}/create_survey.py "MSSS LBA" ${METADATA_DIR}/calibrators.lba.txt ${METADATA_DIR}/grid.lba.txt
