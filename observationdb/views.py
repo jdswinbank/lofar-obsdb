@@ -79,28 +79,26 @@ def survey_summary(request, pk):
     )
 
 def field_list(request):
-    fields = Field.objects.all()
     if request.method == 'GET' and not 'clear' in request.GET:
         form = FieldFilterForm(request.GET)
         if form.is_valid():
-            if form.cleaned_data['survey']:
-                fields = fields.filter(survey_id=form.cleaned_data['survey'])
+            # Filter by position
             try:
                 ra = math.radians(form.cleaned_data['ra'])
                 dec = math.radians(form.cleaned_data['dec'])
                 radius = math.radians(form.cleaned_data['radius'])
-                # Fudge factor of 1e-5 to account for floating point rouding errors:
-                # dec of 90 with 90 degree search doesn't quite hit dec of 0!
-                fields = filter(
-                    lambda x: x.distance_from(ra, dec) <= radius + 1e-5,
-                    fields.filter(dec__gte=dec-radius, dec__lte=dec+radius)
-                )
+                # Fudge factor of 1e-5 to avoid rounding errors.
+                fields = Field.objects.near_position(ra, dec, radius+1e-5)
             except TypeError:
                 # One of the above wasn't specified -- skip this filter.
-                pass
+                fields = Field.objects.all()
+
+            # Filter by survey
+            if form.cleaned_data['survey']:
+                fields = fields.filter(survey_id=form.cleaned_data['survey'])
+
+            # Prepare for display
             fields = fields.annotate(num_beams=Count('beam'))
-            if not form.cleaned_data['sort_by']:
-                form.cleaned_data['sort_by'] = "name"
             if form.cleaned_data['sort_by'] in ("name", "ra", "dec"):
                 fields = fields.order_by(form.cleaned_data['sort_by'])
             elif form.cleaned_data['sort_by'] == "obs":
@@ -109,6 +107,7 @@ def field_list(request):
                 fields = fields.reverse()
 
     else:
+        fields = Field.objects.all()
         form = FieldFilterForm()
 
     queries = request.GET.copy()
