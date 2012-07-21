@@ -6,12 +6,12 @@ from pyrap.quanta import quantity
 from lofar.parameterset import parameterset
 from pyrap.measures import measures
 
-from observationdb.models import Survey
-from observationdb.models import Field
-from observationdb.models import Station
-from observationdb.models import Observation
-from observationdb.models import Beam
-from observationdb.models import Subband
+from obsdb.observationdb.models import Survey
+from obsdb.observationdb.models import Field
+from obsdb.observationdb.models import Station
+from obsdb.observationdb.models import Observation
+from obsdb.observationdb.models import Beam
+from obsdb.observationdb.models import Subband
 
 SURVEY = "MSSS LBA"
 

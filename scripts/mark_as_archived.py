@@ -1,5 +1,5 @@
 import sys
-from observationdb.models import Observation
+from obsdb.observationdb.models import Observation
 
 def mark_as_archived(lower, upper, location):
     for obsid in xrange(lower, upper+1):

@@ -4,11 +4,22 @@ from django.views.generic.simple import redirect_to
 
 from .models import Survey, Observation, Field
 
-urlpatterns = patterns('',
-    url(r'^$', 'observationdb.views.intro'),
+urlpatterns = patterns('obsdb.observationdb.views',
+    # Intro & surveys
+    url(r'^$', 'intro'),
+    url(r'^survey/(?P<pk>.+)/$', 'survey_summary'),
 
-    url(r'^survey/(?P<pk>.+)/$', 'observationdb.views.survey_summary'),
+    # Fields
+    url(r'^field/(?P<pk>\d+)/$',
+        DetailView.as_view(
+            model=Field,
+            template_name='field_detail.html'
+        ),
+        name="field_detail"
+    ),
+    url(r'^field/$', 'field_list'),
 
+    # Observations
     url(r'^observation/$', redirect_to, {'url': '/observation/page1'}),
     url(r'^observation/(?P<pk>L\d+)/$',
         DetailView.as_view(
@@ -26,13 +37,4 @@ urlpatterns = patterns('',
         ),
         name="obs_list"
     ),
-
-    url(r'^field/(?P<pk>\d+)/$',
-        DetailView.as_view(
-            model=Field,
-            template_name='field_detail.html'
-        ),
-        name="field_detail"
-    ),
-    url(r'^field/$', 'observationdb.views.field_list'),
 )

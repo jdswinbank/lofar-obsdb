@@ -1,6 +1,6 @@
 import sys
 from pyrap.quanta import quantity
-from observationdb.models import Survey, Field
+from obsdb.observationdb.models import Survey, Field
 
 def insert_grid_points(survey, filename, calibrator=False):
     with open(filename, 'r') as f:

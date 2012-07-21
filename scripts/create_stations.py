@@ -1,5 +1,5 @@
 import sys
-from observationdb.models import Station
+from obsdb.observationdb.models import Station
 
 if __name__ == "__main__":
     station_file = sys.argv[1]

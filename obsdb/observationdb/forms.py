@@ -1,7 +1,7 @@
 from django import forms
 from django.core.validators import MaxValueValidator, MinValueValidator
 
-from observationdb.models import Survey
+from .models import Survey
 
 class LookupForm(forms.Form):
     target = forms.CharField(max_length=100)

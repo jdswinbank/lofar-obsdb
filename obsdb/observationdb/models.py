@@ -14,7 +14,7 @@ class Survey(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('observationdb.views.survey_summary', [str(self.name)])
+        return ('obsdb.observationdb.views.survey_summary', [str(self.name)])
 
 class FieldManager(models.Manager):
     def near_position(self, ra, dec, radius):

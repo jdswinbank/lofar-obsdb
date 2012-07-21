@@ -10,8 +10,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 from django.db.models.query import QuerySet
 
-from observationdb.models import Survey, Field, Observation
-from observationdb.forms import LookupForm, FieldFilterForm
+from .models import Survey, Field, Observation
+from .forms import LookupForm, FieldFilterForm
 
 def intro(request):
     if request.method == 'POST':

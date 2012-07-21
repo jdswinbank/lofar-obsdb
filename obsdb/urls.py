@@ -5,5 +5,5 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^', include('observationdb.urls'))
+    url(r'^', include('obsdb.observationdb.urls'))
 )
