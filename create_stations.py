@@ -1,5 +1,4 @@
 import sys
-from pyrap.quanta import quantity
 from observationdb.models import Station
 
 if __name__ == "__main__":
