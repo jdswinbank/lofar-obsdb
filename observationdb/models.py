@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.datastructures import SortedDict
-from pyrap.measures import measures
+
+from math import sin, cos, acos
 
 EPOCH = "J2000"
 
@@ -17,12 +18,19 @@ class Survey(models.Model):
 
 class FieldManager(models.Manager):
     def near_position(self, ra, dec, radius):
+        """
+        Return a QuerySet containing those objects within radius of ra, dec.
+        All arguments should be given in radians.
+
+        The returned fields will have an extra attribute, distance, giving the
+        angular separation in radians from the ra, dec supplied.
+        """
         return super(FieldManager, self).get_query_set().filter(
             dec__gte=dec-radius, dec__lte=dec+radius
         ).extra(
             select=SortedDict([('distance', 'SELECT ACOS(SIN(dec)*SIN(%s) + COS(dec)*COS(%s)*COS(ra-%s))')]),
             select_params=(dec, dec, ra),
-            where=['ACOS(SIN(dec)*SIN(%s) + COS(dec)*COS(%s)*COS(ra-%s)) <= %s+1e-5'],
+            where=['ACOS(SIN(dec)*SIN(%s) + COS(dec)*COS(%s)*COS(ra-%s)) <= %s'],
             params=[dec, dec, ra, radius]
         )
 
@@ -47,11 +55,8 @@ class Field(models.Model):
         Returns angular distance between self and ra, dec. All values are
         given and returned in radians.
         """
-        dm = measures()
-        return dm.separation(
-            dm.direction(EPOCH, "%frad" % ra, "%frad" % dec),
-            dm.direction(EPOCH, "%frad" % self.ra, "%frad" % self.dec)
-        ).get_value("rad")
+        return acos(sin(dec)*sin(self.dec) + cos(dec)*cos(self.dec)*cos(ra-self.ra))
+
 
 class Station(models.Model):
     idnumber = models.IntegerField(primary_key=True)
