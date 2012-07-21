@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.datastructures import SortedDict
 from pyrap.measures import measures
 
 EPOCH = "J2000"
@@ -14,7 +15,19 @@ class Survey(models.Model):
     def get_absolute_url(self):
         return ('observationdb.views.survey_summary', [str(self.name)])
 
+class FieldManager(models.Manager):
+    def near_position(self, ra, dec, radius):
+        return super(FieldManager, self).get_query_set().filter(
+            dec__gte=dec-radius, dec__lte=dec+radius
+        ).extra(
+            select=SortedDict([('distance', 'SELECT ACOS(SIN(dec)*SIN(%s) + COS(dec)*COS(%s)*COS(ra-%s))')]),
+            select_params=(dec, dec, ra),
+            where=['ACOS(SIN(dec)*SIN(%s) + COS(dec)*COS(%s)*COS(ra-%s)) <= %s+1e-5'],
+            params=[dec, dec, ra, radius]
+        )
+
 class Field(models.Model):
+    objects = FieldManager()
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=100, blank=True)
     ra = models.FloatField()
