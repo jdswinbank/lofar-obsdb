@@ -51,8 +51,8 @@ function useDefault() {
 //
 function ProjectionMap(projection) {
     this.className = 'ProjectionMap';
-    this.width = 768;
-    this.height = 512;
+    this.width = 626;
+    this.height = this.width / 1.5;
 
     this.DTR = Math.PI / 180.0;
     this.RTD = 180.0 / Math.PI;

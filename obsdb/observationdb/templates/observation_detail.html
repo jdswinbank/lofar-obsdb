@@ -3,68 +3,74 @@
 
 {% if observation %}
 
-<h1>{{ observation.obsid }}</h1>
-
-<hr />
-
-<div class="tabbable tabs-left">
-  <ul class="nav nav-tabs">
-    <li class="active"><a href="#tab1" data-toggle="tab">Summary</a></li>
-    <li><a href="#tab2" data-toggle="tab">Parset</a></li>
-  </ul>
-
-  <div class="tab-content">
-    <div class="tab-pane active" id="tab1">
-      {% if observation.archive %}
-      <p>This observation has been archived at {{ observation.archive }}.
-      {% endif %}
-      <table style="text-align: left; vertical-align: top" class="table table-bordered">
-        <tr>
-          <th>Date</th>
-          <td colspan="2">{{ observation.start_time|date:"Y-m-d" }}</td>
-        </tr>
-        <tr>
-          <th>Start Time</th>
-          <td colspan="2">{{ observation.start_time|date:"H:i:s" }}</td>
-        </tr>
-          <th>Duration</th>
-          <td colspan="2">{{ observation.duration }} s</td>
-        </tr>
-        </tr>
-          <th>Antenna&nbsp;Set</th>
-          <td colspan="2">{{ observation.antennaset }}</td>
-        </tr>
-        <tr>
-          <th>Clock</th>
-          <td colspan="2">{{ observation.clock }} MHz</td>
-        </tr>
-        <tr>
-          <th>Filter</th>
-          <td colspan="2">{{ observation.get_filter_display }}</td>
-        </tr>
-        <tr>
-          <th>Stations</th>
-          <td colspan="2">
-            {% for station in observation.stations.all %}
-              {{ station.name }}{% if not forloop.last %},{% endif %}
-            {% endfor %}
-          </td>
-        </tr>
-        {% for beam in observation.beam_set.all %}
-        <tr>
-          <th rowspan="2">Beam {{ beam.beam }}</th>
-          <th>Target</th>
-          <td style="width: 100%"><a href="{{ beam.field.get_absolute_url }}">{{ beam.field.name }}</a></td>
-        </tr>
-        <tr>
-          <th>Subbands</th>
-          <td>{{ beam.subbands.count }}</a></td>
-        </tr>
-        {% endfor %}
-      </table>
+<div class="row">
+  <div class="span4">
+    <div class="well">
+      <h2 style="text-align: center;">{{ observation.obsid }}</h2>
     </div>
-    <div class="tab-pane" id="tab2">
-      <pre>{{observation.parset}}</pre>
+  </div>
+
+  <div class="span8">
+    <div class="tabbable">
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#tab1" data-toggle="tab">Summary</a></li>
+        <li><a href="#tab2" data-toggle="tab">Parset</a></li>
+      </ul>
+
+      <div class="tab-content">
+        <div class="tab-pane active" id="tab1">
+          {% if observation.archive %}
+          <p>This observation has been archived at {{ observation.archive }}.
+          {% endif %}
+          <table style="text-align: left; vertical-align: top" class="table table-bordered">
+            <tr>
+              <th>Date</th>
+              <td colspan="2">{{ observation.start_time|date:"Y-m-d" }}</td>
+            </tr>
+            <tr>
+              <th>Start Time</th>
+              <td colspan="2">{{ observation.start_time|date:"H:i:s" }}</td>
+            </tr>
+              <th>Duration</th>
+              <td colspan="2">{{ observation.duration }} s</td>
+            </tr>
+            </tr>
+              <th>Antenna&nbsp;Set</th>
+              <td colspan="2">{{ observation.antennaset }}</td>
+            </tr>
+            <tr>
+              <th>Clock</th>
+              <td colspan="2">{{ observation.clock }} MHz</td>
+            </tr>
+            <tr>
+              <th>Filter</th>
+              <td colspan="2">{{ observation.get_filter_display }}</td>
+            </tr>
+            <tr>
+              <th>Stations</th>
+              <td colspan="2">
+                {% for station in observation.stations.all %}
+                  {{ station.name }}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+              </td>
+            </tr>
+            {% for beam in observation.beam_set.all %}
+            <tr>
+              <th rowspan="2">Beam {{ beam.beam }}</th>
+              <th>Target</th>
+              <td style="width: 100%"><a href="{{ beam.field.get_absolute_url }}">{{ beam.field.name }}</a></td>
+            </tr>
+            <tr>
+              <th>Subbands</th>
+              <td>{{ beam.subbands.count }}</a></td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+        <div class="tab-pane" id="tab2">
+          <pre>{{observation.parset}}</pre>
+        </div>
+      </div>
     </div>
   </div>
 </div>
