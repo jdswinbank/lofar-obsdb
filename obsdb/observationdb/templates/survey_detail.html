@@ -10,7 +10,7 @@
       <h2 style="text-align: center;">{{survey.name}}</h2>
       <h2 style="text-align: center; line-height: 20px;"><small>{{ survey.description }}</small></h2>
 
-      <p>This survey consists of {{ survey.field_set.count }} fields of which
+      <p style="margin-top: 1em;">This survey consists of {{ survey.field_set.count }} fields of which
       {{ n_observed }} ({{ percentage|floatformat }}%) have been observed a total of {{ n_beams }} times{% if n_beams > 0 %}
       between {{ start_time|date:"j N Y" }} and {{ stop_time|date:"j N Y" }}{% endif %}.</p>
 
