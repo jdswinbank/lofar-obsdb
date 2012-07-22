@@ -7,11 +7,13 @@ from django.template import RequestContext
 from django.db.models import Min, Max, Count
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models.query import QuerySet
 
 from .models import Survey, Field, Observation
 from .forms import LookupForm, FieldFilterForm
+
+from ..settings import PAGE_SIZE
 
 def intro(request):
     if request.method == 'POST':
@@ -126,11 +128,28 @@ def field_list(request):
     else:
         page = 1
 
-    paginator = Paginator(fields, 100)
+    paginator = Paginator(fields, PAGE_SIZE)
     field_list = paginator.page(page)
 
     return render_to_response(
         'field_list.html',
         {'field_list': field_list, 'form': form, 'queries': queries},
+        context_instance=RequestContext(request)
+    )
+
+def field_detail(request, pk):
+    field = Field.objects.get(pk=pk)
+    paginator = Paginator(field.beam_set.all(), PAGE_SIZE)
+    page = request.GET.get('page')
+    try:
+        beam_set = paginator.page(page)
+    except PageNotAnInteger:
+        beam_set = paginator.page(1)
+    except EmptyPage:
+        beam_set = paginator.page(paginator.num_pages)
+
+    return render_to_response(
+        'field_detail.html',
+        {'field': field, 'beam_set': beam_set},
         context_instance=RequestContext(request)
     )

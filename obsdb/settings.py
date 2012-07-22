@@ -142,3 +142,6 @@ LOGGING = {
         },
     }
 }
+
+# Default size for paginated pages
+PAGE_SIZE = 100

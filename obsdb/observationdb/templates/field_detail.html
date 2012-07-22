@@ -1,53 +1,72 @@
 {% extends "base.html" %}
-{% block contents %}
-
 {% load position %}
+{% block contents %}
 
 {% if field %}
 
-<h1>{{ field.name }} <small>{{ field.description }}</small></h1>
+<div class="row">
+  <div class="span4">
+    <div class="well">
+      <h2 style="text-align: center;">{{field.name}}</h2>
+      <h2 style="text-align: center; line-height: 20px;"><small>{{ field.description }}</small></h2>
 
-<hr />
+      <table style="text-align: left; margin-top: 1em; margin-bottom: 1em;">
+        <tr>
+          <th style="padding-right: 1em;">Right Ascension</th>
+          <td>{{ field.ra|format_angle:"time" }}</td>
+        </tr>
+        <tr>
+          <th>Declination</th>
+          <td>{{field.dec|format_angle:"dms" }}</td>
+        </tr>
+        <tr>
+          <th>Survey</th>
+          <td>{{ field.survey.name }}</td>
+        </tr>
+        <tr>
+          <th># Observations</th>
+          <td>{{ field.beam_set.count }}</td>
+        </tr>
+        <tr>
+          <th>Calibrator</th>
+          <td>{% if field.calibrator %}<i class="icon-ok"></i>{% else %}<i class="icon-remove"></i>{% endif %}</td>
+        </tr>
+      </table>
+      <p style="margin-top: 1em; text-align:center;">
+        {% if beam_set.has_previous %}
+        <a href="?page={{ beam_set.previous_page_number }}"><i class="icon-backward"></i></a>
+        {% endif %}
+        Page {{ beam_set.number }} of {{ beam_set.paginator.num_pages }}
+        {% if beam_set.has_next %}
+        <a href="?page={{ beam_set.next_page_number }}"><i class="icon-forward"></i></a>
+        {% endif %}
+      </p>
+    </div>
+  </div>
 
-<table style="text-align: left; margin-bottom: 1em;">
-  <tr>
-    <th style="padding-right: 1em;">Right Ascension</th>
-    <td>{{ field.ra|format_angle:"time" }}</td>
-  </tr>
-  <tr>
-    <th>Declination</th>
-    <td>{{field.dec|format_angle:"dms" }}</td>
-  </tr>
-</table>
-
-<p>This field is part of the <strong>{{ field.survey.name }}</strong>
-survey. It has been observed on {{ field.beam_set.count }} separate
-occasions.</p>
-
-{% if field.calibrator %}
-  <p>This field is a calibrator.</p>
-{% endif %}
-
-<table class="table table-condensed table-striped">
-  <thead>
-    <tr>
-      <th>Observation</th>
-      <th>Beam</th>
-      <th>Date</th>
-      <th>Duration (seconds)</th>
-      <th>Archived</th>
-    </tr>
-  </thead>
-  {% for beam in field.beam_set.all %}
-  <tr>
-    <td><a href="{{ beam.observation.get_absolute_url }}">{{ beam.observation.obsid }}</a></td>
-    <td>{{ beam.beam }}</td>
-    <td>{{ beam.observation.start_time|date:"Y-m-d H:i:s" }}</td>
-    <td>{{ beam.observation.duration }}</td>
-    <td>{% if beam.observation.archive %}<i class="icon-ok"></i>{% else %}<i class="icon-remove"></i>{% endif %}</td>
-  </tr>
-  {% endfor %}
-</table>
+  <div class="span8">
+    <table class="table table-condensed table-striped">
+      <thead>
+        <tr>
+          <th>Observation</th>
+          <th>Beam</th>
+          <th>Date</th>
+          <th>Duration</th>
+          <th>Archived</th>
+        </tr>
+      </thead>
+      {% for beam in beam_set %}
+      <tr>
+        <td><a href="{{ beam.observation.get_absolute_url }}">{{ beam.observation.obsid }}</a></td>
+        <td>{{ beam.beam }}</td>
+        <td>{{ beam.observation.start_time|date:"Y-m-d H:i:s" }}</td>
+        <td>{{ beam.observation.duration }} s</td>
+        <td>{% if beam.observation.archive %}<i class="icon-ok"></i>{% else %}<i class="icon-remove"></i>{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
 
 {% endif %}
 {% endblock %}
