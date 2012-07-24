@@ -63,10 +63,23 @@ def survey_summary(request, pk):
         field_size = 0
     start_time = s.field_set.aggregate(Min('beam__observation__start_time')).values()[0]
     stop_time = s.field_set.aggregate(Max('beam__observation__start_time')).values()[0]
-    field_list = [
-        (f.ra, f.dec, "g" if f.beam_set.count() else "r")
-        for f in s.field_set.filter(calibrator=False)
-    ]
+
+    field_list = []
+    for f in s.field_set.filter(calibrator=False):
+        if f.beam_set.count():
+            if f.beam_set.count() == f.beam_set.exclude(observation__archive="").count():
+                # All observations have been archived
+                colour = "y"
+                print f.name
+                for beam in f.beam_set.all():
+                    print beam.observation.obsid
+            elif f.beam_set.count():
+                # Observed but not archived
+                colour = "g"
+        else:
+            # Not observed
+            colour = "r"
+        field_list.append((f.ra, f.dec, colour))
 
     return render_to_response(
         'survey_detail.html',
