@@ -70,9 +70,6 @@ def survey_summary(request, pk):
             if f.beam_set.count() == f.beam_set.exclude(observation__archive="").count():
                 # All observations have been archived
                 colour = "y"
-                print f.name
-                for beam in f.beam_set.all():
-                    print beam.observation.obsid
             elif f.beam_set.count():
                 # Observed but not archived
                 colour = "g"
