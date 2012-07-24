@@ -12,6 +12,7 @@ from obsdb.observationdb.models import Station
 from obsdb.observationdb.models import Observation
 from obsdb.observationdb.models import Beam
 from obsdb.observationdb.models import Subband
+from obsdb.observationdb.models import SubbandData
 
 SURVEY = "MSSS LBA"
 
@@ -150,6 +151,7 @@ def upload_to_djangodb(parsets):
         observation.stations = Station.objects.filter(name__in=parset.stations())
         observation.save()
 
+        sb_ctr = 1
         for beam_number in range(parset.get_int("Observation.nrBeams")):
             field = parset.get_field(beam_number)
             if field:
@@ -160,6 +162,18 @@ def upload_to_djangodb(parsets):
                 )
                 beam.subbands = Subband.objects.filter(number__in=parset.subbands(beam_number))
                 beam.save()
+                sb_list = []
+                for subband in beam.subbands.all():
+                    sb_list.append(
+                        SubbandData(
+                            id=obsid+"_"+str(sb_ctr),
+                            beam=beam,
+                            number=sb_ctr,
+                            subband=subband
+                        )
+                    )
+                    sb_ctr += 1
+                SubbandData.objects.bulk_create(sb_list)
             else:
                 print "WARNING! Unrecognized field: %s beam %d" % (obsid, beam_number)
 

@@ -61,7 +61,7 @@
         <td>{{ beam.beam }}</td>
         <td>{{ beam.observation.start_time|date:"Y-m-d H:i:s" }}</td>
         <td>{{ beam.observation.duration }} s</td>
-        <td>{% if beam.observation.archive %}<i class="icon-ok"></i>{% else %}<i class="icon-remove"></i>{% endif %}</td>
+        <td>{% if beam.observation.archived %}<i class="icon-ok"></i>{% else %}<i class="icon-remove"></i>{% endif %}</td>
       </tr>
       {% endfor %}
     </table>

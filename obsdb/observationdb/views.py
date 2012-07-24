@@ -37,7 +37,7 @@ def intro(request):
             'n_targets': Field.objects.filter(calibrator=False).count(),
             'n_calibrators': Field.objects.filter(calibrator=True).count(),
             'n_observations': Observation.objects.count(),
-            'n_archived': Observation.objects.exclude(archive="").count()
+            'n_archived': Observation.objects.archived().count()
         },
         context_instance=RequestContext(request)
     )

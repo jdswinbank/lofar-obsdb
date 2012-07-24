@@ -1,13 +1,17 @@
 import sys
-from obsdb.observationdb.models import Observation
+from obsdb.observationdb.models import SubbandData, Observation, ArchiveSite
 
 def mark_as_archived(lower, upper, location):
+    site = ArchiveSite.objects.get_or_create(name=location)
+
     for obsid in xrange(lower, upper+1):
         obsid = "L" + str(obsid)
         try:
             obs = Observation.objects.get(obsid=obsid)
-            obs.archive = location
-            obs.save()
+            for sb in SubbandData.objects.filter(beam__in=obs.beam_set.all()):
+                sb.archive = site
+                sb.save()
+            print "Done %s" % obsid
         except:
             print "%s is not in the database" % obsid
 
