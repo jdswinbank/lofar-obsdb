@@ -10,6 +10,10 @@ def mark_as_archived(lower, upper, location):
         try:
             obs = Observation.objects.get(obsid=obsid)
             SubbandData.objects.filter(beam__in=obs.beam_set.all()).update(archive=site)
+            for beam in obs.beam_set.all():
+                beam.archived = True
+                beam.good = True
+                beam.save()
             print "Done %s" % obsid
         except ObjectDoesNotExist:
             print "%s is not in the database" % obsid

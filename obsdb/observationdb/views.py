@@ -37,7 +37,7 @@ def intro(request):
             'n_targets': Field.objects.filter(calibrator=False).count(),
             'n_calibrators': Field.objects.filter(calibrator=True).count(),
             'n_observations': Observation.objects.count(),
-            'n_archived': Observation.objects.archived().count()
+            'n_archived': Observation.objects.filter(archived=True).count()
         },
         context_instance=RequestContext(request)
     )
@@ -51,13 +51,6 @@ def survey_summary(request, pk):
     n_observed = s.field_set.annotate(num_beams=Count('beam')).filter(num_beams__gt=0).count()
     if s.field_set.count() > 0:
         percentage = 100*float(n_observed)/s.field_set.count()
-
-        # Assuming data is on a regular grid, we set the size of the grid
-        # cells equal to whichever is larger of the difference between the
-        # points in RA and dec space.
-        decs = s.field_set.values_list('dec').distinct().order_by('dec')[0:2]
-        ras = s.field_set.values_list('ra').distinct().order_by('ra')[0:2]
-        field_size = math.degrees(max(decs[1][0]-decs[0][0], ras[1][0]-ras[0][0]))/2
     else:
         percentage = 0
         field_size = 0
@@ -66,7 +59,7 @@ def survey_summary(request, pk):
 
     field_list = []
     for f in s.field_set.filter(calibrator=False):
-        if f in Field.objects.archived():
+        if f.archived:
             colour = "y"
         elif f.beam_set.count():
             # At least one observation
@@ -82,7 +75,7 @@ def survey_summary(request, pk):
         {
             'survey': s,
             'field_list': field_list,
-            'field_size': field_size,
+            'field_size': s.field_size,
             'n_beams': n_beams,
             'n_observed': n_observed,
             'percentage': percentage,

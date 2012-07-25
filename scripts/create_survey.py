@@ -22,9 +22,13 @@ def insert_grid_points(survey, filename, calibrator=False):
 
 if __name__ == "__main__":
     survey_name = sys.argv[1]
-    calibrator_filename = sys.argv[2]
-    grid_filename = sys.argv[3]
+    field_size = float(sys.argv[2])
+    beams_per_field = int(sys.argv[3])
+    calibrator_filename = sys.argv[4]
+    grid_filename = sys.argv[5]
 
-    survey, created = Survey.objects.get_or_create(name=survey_name)
+    survey, created = Survey.objects.get_or_create(
+        name=survey_name, field_size=field_size, beams_per_field=beams_per_field
+    )
     insert_grid_points(survey, calibrator_filename, calibrator=True)
     insert_grid_points(survey, grid_filename, calibrator=False)
