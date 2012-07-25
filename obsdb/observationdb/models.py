@@ -70,6 +70,13 @@ class FieldManager(models.Manager):
             params=[dec, dec, ra, radius]
         )
 
+    def archived(self):
+        # None of the Beams are not archived and at least one Beam is
+        # archived.
+        return super(FieldManager, self).exclude(
+            beam__in=Beam.objects.not_archived()
+        ).filter(beam__in=Beam.objects.archived()).distinct()
+
 
 class Field(models.Model):
     objects = FieldManager()
@@ -93,6 +100,12 @@ class Field(models.Model):
         given and returned in radians.
         """
         return acos(sin(dec)*sin(self.dec) + cos(dec)*cos(self.dec)*cos(ra-self.ra))
+
+    @property
+    def archived(self):
+        n_beams = self.beam_set.count()
+        n_archived = len(filter(lambda beam: beam.archived, self.beam_set.all()))
+        return n_beams == n_archived
 
     class Meta:
         ordering = ['name']
@@ -158,7 +171,10 @@ class Observation(models.Model):
 
     @property
     def archived(self):
-        return self in Observation.objects.archived()
+#        return self in Observation.objects.archived()
+        n_beams = self.beam_set.count()
+        n_archived = len(filter(lambda beam: beam.archived, self.beam_set.all()))
+        return n_beams == n_archived
 
     class Meta:
         ordering = ['start_time']
@@ -189,7 +205,7 @@ class BeamDataManager(models.Manager):
         # SubbandData has been archived, and no SubbandDatas are not archived.
         # Note that Beams which are bad (because they are missing some
         # subbands) can still be archived under this definition.
-        return super(BeamDataManager, self).get_query_set().filter(
+        return super(BeamDataManager, self).get_query_set().select_related().filter(
             subbanddata__in=SubbandData.objects.archived()
         ).distinct().exclude(
             subbanddata__in=SubbandData.objects.not_archived()
@@ -198,7 +214,7 @@ class BeamDataManager(models.Manager):
     def not_archived(self):
         # For the Beam not to be archived, we require that at least one
         # SubbandData has not been archived
-        return super(BeamDataManager, self).get_query_set().filter(
+        return super(BeamDataManager, self).get_query_set().select_related().filter(
             subbanddata__in=SubbandData.objects.not_archived()
         )
 
@@ -209,6 +225,12 @@ class Beam(models.Model):
     beam = models.IntegerField()
     field = models.ForeignKey(Field)
     subbands = models.ManyToManyField(Subband)
+
+    @property
+    def archived(self):
+        total_sbs = self.subbands.count()
+        archived_sbs = self.subbanddata_set.exclude(archive=None).count()
+        return total_sbs == archived_sbs
 
     def __unicode__(self):
         return self.observation.obsid + " beam " + str(self.beam)

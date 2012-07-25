@@ -66,16 +66,15 @@ def survey_summary(request, pk):
 
     field_list = []
     for f in s.field_set.filter(calibrator=False):
-        if f.beam_set.count():
-            if f.beam_set.count() == f.beam_set.exclude(observation__archive="").count():
-                # All observations have been archived
-                colour = "y"
-            elif f.beam_set.count():
-                # Observed but not archived
-                colour = "g"
+        if f in Field.objects.archived():
+            colour = "y"
+        elif f.beam_set.count():
+            # At least one observation
+            colour = "g"
         else:
             # Not observed
             colour = "r"
+
         field_list.append((f.ra, f.dec, colour))
 
     return render_to_response(
