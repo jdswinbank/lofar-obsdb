@@ -151,7 +151,7 @@ def upload_to_djangodb(parsets):
         observation.stations = Station.objects.filter(name__in=parset.stations())
         observation.save()
 
-        sb_ctr = 1
+        sb_ctr = 0
         for beam_number in range(parset.get_int("Observation.nrBeams")):
             field = parset.get_field(beam_number)
             if field:
