@@ -7,7 +7,7 @@
   <div class="span4">
     <div class="well">
       <h2 style="text-align: center;">{{ observation.obsid }}</h2>
-      {% if observation.archived %}
+      {% if observation.archived == "true" %}
       <p>This observation has been archived.</p>
       {% endif %}
     </div>

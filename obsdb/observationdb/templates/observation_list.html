@@ -44,7 +44,7 @@
         <a href="{{ beam.field.get_absolute_url }}">{{ beam.field.name }}</a>{% if not forloop.last %},{% endif %}
       {% endfor %}
       </td>
-      <td>{% if obs.archived %}<i class="icon-ok"></i>{% else %}<i class="icon-remove"></i>{% endif %}</td>
+      <td>{% if obs.archived == "true" %}<i class="icon-ok"></i>{% else %}<i class="icon-remove"></i>{% endif %}</td>
     </tr>
 
     {% endfor %}

@@ -5,6 +5,20 @@ from math import sin, cos, acos
 
 EPOCH = "J2000"
 
+# These are the states which Fields, Observations and Beams can have to
+# reflect where their data is available.
+ARCHIVE_CHOICES = (
+    ("true", "Archived"),
+    ("partial", "Partially archived"),
+    ("false", "Not archived")
+)
+ON_CEP_CHOICES = (
+    ("true", "Available on CEP"),
+    ("partial", "Partially available on CEP"),
+    ("false", "Not available on CEP")
+)
+MAX_CHOICE_LENGTH=len("partial")
+
 class ArchiveSite(models.Model):
     name = models.CharField(max_length=20, primary_key=True)
 
@@ -81,11 +95,40 @@ class Field(models.Model):
     dec = models.FloatField()
     survey = models.ForeignKey(Survey)
     calibrator = models.BooleanField(default=False)
-    archived = models.BooleanField(default=False)
+    archived = models.CharField(
+        choices=ARCHIVE_CHOICES, max_length=MAX_CHOICE_LENGTH,
+        default="false", editable=False
+    )
+    on_cep = models.CharField(
+        choices=ON_CEP_CHOICES, max_length=MAX_CHOICE_LENGTH,
+        default="false", editable=False
+    )
     done = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.name
+
+    def _update_status(self):
+        beams_per_field = self.survey.beams_per_field
+
+        if self.beam_set.filter(archived="true").count() >= beams_per_field:
+            self.archived = "true"
+        elif self.beam_set.filter(models.Q(archived="true") | models.Q(archived="partial")).count() > 0:
+            self.archived = "partial"
+        else:
+            self.archived = "false"
+
+        if self.beam_set.filter(on_cep="true").count() >= beams_per_field:
+            self.on_cep = "true"
+        elif self.beam_set.filter(models.Q(on_cep="true") | models.Q(on_cep="partial")).count() > 0:
+            self.on_cep = "partial"
+        else:
+            self.on_cep = "false"
+
+        if self.on_cep == "true" or self.archived == "true":
+            self.done = True
+
+        self.save()
 
     @models.permalink
     def get_absolute_url(self):
@@ -137,10 +180,37 @@ class Observation(models.Model):
     clock = models.IntegerField(choices=CLOCK_CHOICES)
     filter = models.CharField(max_length=15, choices=FILTER_CHOICES)
     parset = models.TextField()
-    archived = models.BooleanField(default=False)
+    archived = models.CharField(
+        choices=ARCHIVE_CHOICES, max_length=MAX_CHOICE_LENGTH,
+        default="false", editable=False
+    )
+    on_cep = models.CharField(
+        choices=ON_CEP_CHOICES, max_length=MAX_CHOICE_LENGTH,
+        default="false", editable=False
+    )
+    invalid = models.BooleanField(default=False) # For use by humans
 
     def __unicode__(self):
         return self.obsid
+
+    def _update_status(self):
+        n_beams = self.beam_set.count()
+
+        if self.beam_set.filter(archived="true").count() == n_beams:
+            self.archived = "true"
+        elif self.beam_set.filter(models.Q(archived="true") | models.Q(archived="partial")).count() > 0:
+            self.archived = "partial"
+        else:
+            self.archived = "false"
+
+        if self.beam_set.filter(on_cep="true").count() == n_beams:
+            self.on_cep = "true"
+        elif self.beam_set.filter(models.Q(on_cep="true") | models.Q(on_cep="partial")).count() > 0:
+            self.on_cep = "partial"
+        else:
+            self.on_cep = "false"
+
+        self.save()
 
     @models.permalink
     def get_absolute_url(self):
@@ -155,38 +225,39 @@ class Beam(models.Model):
     beam = models.IntegerField()
     field = models.ForeignKey(Field)
     subbands = models.ManyToManyField(Subband)
-    archived = models.BooleanField(default=False)
-    good = models.BooleanField(default=False)
+    archived = models.CharField(choices=ARCHIVE_CHOICES, max_length=MAX_CHOICE_LENGTH, default="false", editable=False)
+    on_cep = models.CharField(choices=ON_CEP_CHOICES, max_length=MAX_CHOICE_LENGTH, default="false", editable=False)
+    invalid = models.BooleanField(default=False) # For use by humans
 
     def save(self, *args, **kwargs):
         # Augment save to mark our Observation & Field as archived if all of its subbands are
         # now archived.
         super(Beam, self).save(*args, **kwargs)
-        n_archived_beams = self.observation.beam_set.filter(archived=True).count()
-        n_good_beams = self.observation.beam_set.filter(good=True).count()
+        self.observation._update_status()
+        self.field._update_status()
 
-        if n_archived_beams == self.observation.beam_set.count():
-            self.observation.archived = True
-        else:
-            self.observation.archived = False
-        if n_good_beams == self.observation.beam_set.count():
-            self.observation.good = True
-        else:
-            self.observation.good = False
-        self.observation.save()
+    def _update_status(self):
+        n_sbs = self.subbands.count()
 
-        n_archived_beams = self.field.beam_set.filter(archived=True).count()
-        n_good_beams = self.field.beam_set.filter(good=True).count()
+        # If all our subbands are archived, we are archived.
+        n_archived = self.subbanddata_set.exclude(archive=None).count()
+        if n_archived == n_sbs:
+            self.archived = "true"
+        elif n_archived > 0:
+            self.archived = "partial"
+        else:
+            self.archived = "false"
 
-        if n_archived_beams == self.field.survey.beams_per_field:
-            self.field.archived = True
+        # If all our subbands are on CEP, we are on CEP.
+        n_on_cep = self.subbanddata_set.exclude(hostname="", path="")
+        if n_on_cep == n_sbs:
+            self.on_cep = "true"
+        elif n_on_cep > 0:
+            self.on_cep = "partial"
         else:
-            self.field.archived = False
-        if n_good_beams == self.field.survey.beams_per_field:
-            self.field.done = True
-        else:
-            self.field.done = False
-        self.field.save()
+            self.on_cep = "false"
+
+        self.save()
 
     def __unicode__(self):
         return self.observation.obsid + " beam " + str(self.beam)
@@ -208,23 +279,7 @@ class SubbandData(models.Model):
 
     def save(self, *args, **kwargs):
         super(SubbandData, self).save(*args, **kwargs)
-
-        # Mark our Beam as archived if all of its subbands are now archived.
-        if self.beam.subbanddata_set.exclude(archive=None).count() == self.beam.subbands.count():
-            self.beam.archived = True
-        else:
-            self.beam.archived = False
-
-        # Mark our Beam as good if all of its subbands are either archived or
-        # on CEP.
-        if self.beam.subbanddata_set.filter(
-            ~models.Q(archive=None) | ~models.Q(hostname="") & ~models.Q(path="")
-        ).count() == self.beam.subbands.count():
-            self.beam.good = True
-        else:
-            self.beam.good = False
-
-        self.beam.save()
+        self.beam._update_status()
 
     def __unicode__(self):
         return self.beam.observation.obsid + " SAP" + str(self.beam.beam) + " SB" + str(self.number)
