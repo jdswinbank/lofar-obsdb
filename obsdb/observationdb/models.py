@@ -249,7 +249,7 @@ class Beam(models.Model):
             self.archived = "false"
 
         # If all our subbands are on CEP, we are on CEP.
-        n_on_cep = self.subbanddata_set.exclude(hostname="", path="")
+        n_on_cep = self.subbanddata_set.exclude(hostname="", path="").count()
         if n_on_cep == n_sbs:
             self.on_cep = "true"
         elif n_on_cep > 0:
