@@ -228,3 +228,6 @@ class SubbandData(models.Model):
 
     def __unicode__(self):
         return self.beam.observation.obsid + " SAP" + str(self.beam.beam) + " SB" + str(self.number)
+
+    class Meta:
+        ordering = ['number']
