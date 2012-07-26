@@ -37,7 +37,7 @@ def intro(request):
             'n_targets': Field.objects.filter(calibrator=False).count(),
             'n_calibrators': Field.objects.filter(calibrator=True).count(),
             'n_observations': Observation.objects.count(),
-            'n_archived': Observation.objects.filter(archived=True).count()
+            'n_archived': Observation.objects.filter(archived="true").count()
         },
         context_instance=RequestContext(request)
     )
@@ -59,13 +59,20 @@ def survey_summary(request, pk):
 
     field_list = []
     for f in s.field_set.filter(calibrator=False):
-        if f.archived:
-            colour = "y"
-        elif f.beam_set.count():
-            # At least one observation
-            colour = "g"
-        else:
+        if f.beam_set.count() == 0:
             # Not observed
+            colour = "o"
+        elif f.archived == "true":
+            # Data has been archived
+            colour = "y"
+        elif f.on_cep == "true":
+            # Data available on CEP
+            colour = "g"
+        elif f.on_cep == "partial" or f.archived == "partial":
+            # Partially observed
+            colour = "b"
+        else:
+            # Data missing
             colour = "r"
 
         field_list.append((f.ra, f.dec, colour))
