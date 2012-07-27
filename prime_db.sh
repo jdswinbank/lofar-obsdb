@@ -17,3 +17,4 @@ python ${SCRIPT_DIR}/create_survey.py "MSSS LBA" 2.885 9 ${METADATA_DIR}/calibra
 python ${SCRIPT_DIR}/create_survey.py "MSSS HBA" 1.21 2 ${METADATA_DIR}/calibrators.hba.txt ${METADATA_DIR}/grid.hba.txt
 python ${SCRIPT_DIR}/load_data.py
 python ${SCRIPT_DIR}/mark_as_archived.py ${METADATA_DIR}/archived_data.txt
+for file in /home/jds/tmp/msss_data/L*log; do python ${SCRIPT_DIR}/insert_file_list.py `basename $file .log` $file | tee $file.load ; done
