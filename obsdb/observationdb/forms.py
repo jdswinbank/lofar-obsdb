@@ -2,6 +2,7 @@ from django import forms
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 from .models import Survey
+from .models import FieldStatus
 
 class LookupForm(forms.Form):
     target = forms.CharField(max_length=100)
@@ -22,12 +23,12 @@ class FieldFilterForm(forms.Form):
     status = forms.ChoiceField(required=False, label="Status",
         choices=(
             (None, "[All]"),
-            ('cal', 'Calibrator'),
-            ('not', 'Not Observed'),
-            ('arc', 'Archived'),
-            ('cep', 'On CEP'),
-            ('par', 'Partial'),
-            ('unk', 'Unknown')
+            (FieldStatus.CALIBRATOR, 'Calibrator'),
+            (FieldStatus.NOT_OBSERVED, 'Not Observed'),
+            (FieldStatus.ARCHIVED, 'Archived'),
+            (FieldStatus.ON_CEP, 'On CEP'),
+            (FieldStatus.PARTIAL, 'Partial'),
+            (FieldStatus.UNKNOWN, 'Unknown')
         ),
         widget=forms.Select(attrs={'style': 'width: 120px'}))
     sort_by = forms.ChoiceField(required=False, label="Sort By",

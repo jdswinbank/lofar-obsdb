@@ -10,7 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models.query import QuerySet
 
-from .models import Survey, Field, Observation, Constants
+from .models import Survey, Field, Observation, Constants, FieldStatus
 from .forms import LookupForm, FieldFilterForm
 
 from ..settings import PAGE_SIZE
@@ -117,15 +117,15 @@ def field_list(request):
             fields = fields.annotate(num_beams=Count('beam'))
             if form.cleaned_data['status'] and form.cleaned_data['status'] != "None":
                 status = form.cleaned_data['status']
-                if status == 'cal':
+                if status == FieldStatus.CALIBRATOR:
                     fields = fields.filter(calibrator=True)
-                elif status == 'not':
+                elif status == FieldStatus.NOT_OBSERVED:
                     fields = fields.filter(num_beams=0)
-                elif status =='arc':
+                elif status == FieldStatus.ARCHIVED:
                     fields = fields.filter(archived=Constants.TRUE)
-                elif status == 'cep':
+                elif status == FieldStatus.ON_CEP:
                     fields = fields.filter(on_cep=Constants.TRUE)
-                elif status == 'par':
+                elif status == FieldStatus.PARTIAL:
                     fields = fields.filter(Q(on_cep=Constants.PARTIAL) | Q(archived=Constants.PARTIAL))
                 else:
                     fields = fields.filter(calibrator=False, archived=Constants.FALSE, on_cep=Constants.FALSE).exclude(num_beams=0)

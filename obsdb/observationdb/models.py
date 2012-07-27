@@ -12,6 +12,14 @@ class Constants(object):
     PARTIAL = "partial"
     FALSE = "false"
 
+class FieldStatus(object):
+    CALIBRATOR = "cal"
+    NOT_OBSERVED = "not"
+    ARCHIVED = "arc"
+    ON_CEP = "cep"
+    PARTIAL = "par"
+    UNKNOWN = "unk"
+
 ARCHIVE_CHOICES = (
     (Constants.TRUE, "Archived"),
     (Constants.PARTIAL, "Partially archived"),
@@ -94,6 +102,7 @@ class FieldManager(models.Manager):
 
 class Field(models.Model):
     objects = FieldManager()
+
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=100, blank=True)
     ra = models.FloatField()
@@ -153,17 +162,18 @@ class Field(models.Model):
         # CEP and archived), but there's no easy way to present that yet.
         status = []
         if self.calibrator:
-            return "Calibrator"
-        elif self.beam_set.count() == 0:
-            return "Not observed"
-        elif self.archived == Constants.TRUE:
-            return "Archived"
-        elif self.on_cep == Constants.TRUE:
-            return "On CEP"
-        elif self.on_cep == Constants.PARTIAL or self.archived == Constants.PARTIAL:
-            return "Partial"
-        else:
-            return "Unknown"
+            status.append(FieldStatus.CALIBRATOR)
+        if self.beam_set.count() == 0:
+            status.append(FieldStatus.NOT_OBSERVED)
+        if self.archived == Constants.TRUE:
+            status.append(FieldStatus.ARCHIVED)
+        if self.on_cep == Constants.TRUE:
+            status.append(FieldStatus.ON_CEP)
+        if self.on_cep == Constants.PARTIAL or self.archived == Constants.PARTIAL:
+            status.append(FieldStatus.PARTIAL)
+        if not status:
+            status.append(FieldStatus.UNKNOWN)
+        return status
 
     class Meta:
         ordering = ['name']

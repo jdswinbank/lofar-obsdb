@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load position %}
+{% load status %}
 
 {% block contents %}
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
@@ -72,11 +73,38 @@
     <td style="text-align: right;">{% if field.distance or field.distance == 0 %}{{ field.distance|to_degrees|floatformat }}&deg;{% else %}-{% endif %}</td>
     <td>{{ field.survey.name }}</td>
     <td style="text-align: right;">{{ field.num_beams }}</td>
-    <td>{{ field.status }}</td>
+    <td>
+      {% for status in field.status %}
+        <i rel="tooltip" class="{{ status|status_icon}}"></i>
+      {% endfor %}
+    </td>
   </tr>
 
   {% endfor %}
 </table>
 </div>
 </div>
+{% endblock %}
+
+{% block extra_javascript %}
+<script>
+$(function() {
+    $('.icon-cog').tooltip({title: "Calibrator"});
+    });
+$(function() {
+    $('.icon-remove').tooltip({title: "Not Observed"});
+    });
+$(function() {
+    $('.icon-hdd').tooltip({title: "Archived"});
+    });
+$(function() {
+    $('.icon-star').tooltip({title: "On CEP"});
+    });
+$(function() {
+    $('.icon-star-empty').tooltip({title: "Partial Data Available"});
+    });
+$(function() {
+    $('.icon-question-sign').tooltip({title: "Unknown"});
+    });
+</script>
 {% endblock %}
