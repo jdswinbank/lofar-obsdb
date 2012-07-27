@@ -10,25 +10,25 @@
       <h2 style="text-align: center;">{{field.name}}</h2>
       <h2 style="text-align: center; line-height: 20px;"><small>{{ field.description }}</small></h2>
 
-      <table style="text-align: left; margin-top: 1em; margin-bottom: 1em;">
+      <table class="table" style="margin-top: 1em; margin-bottom: 1em;">
         <tr>
-          <th style="padding-right: 1em;">Right Ascension</th>
-          <td>{{ field.ra|format_angle:"time" }}</td>
+          <td style="border-top: none">Right Ascension</td>
+          <td style="border-top: none">{{ field.ra|format_angle:"time" }}</td>
         </tr>
         <tr>
-          <th>Declination</th>
+          <td>Declination</td>
           <td>{{field.dec|format_angle:"dms" }}</td>
         </tr>
         <tr>
-          <th>Survey</th>
+          <td>Survey</td>
           <td>{{ field.survey.name }}</td>
         </tr>
         <tr>
-          <th># Observations</th>
+          <td># Observations</td>
           <td>{{ field.beam_set.count }}</td>
         </tr>
         <tr>
-          <th>Calibrator</th>
+          <td>Calibrator</td>
           <td>{% if field.calibrator %}<i class="icon-ok"></i>{% else %}<i class="icon-remove"></i>{% endif %}</td>
         </tr>
       </table>
