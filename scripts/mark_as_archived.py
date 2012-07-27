@@ -1,6 +1,6 @@
 import sys
 from django.core.exceptions import ObjectDoesNotExist
-from obsdb.observationdb.models import SubbandData, Observation, ArchiveSite
+from obsdb.observationdb.models import SubbandData, Observation, ArchiveSite, Constants
 
 def mark_as_archived(lower, upper, location):
     site, created = ArchiveSite.objects.get_or_create(name=location)
@@ -11,7 +11,7 @@ def mark_as_archived(lower, upper, location):
             obs = Observation.objects.get(obsid=obsid)
             SubbandData.objects.filter(beam__in=obs.beam_set.all()).update(archive=site)
             for beam in obs.beam_set.all():
-                beam.archived = "true"
+                beam.archived = Constants.TRUE
                 beam.save()
             print "Done %s" % obsid
         except ObjectDoesNotExist:

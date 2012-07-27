@@ -7,17 +7,22 @@ EPOCH = "J2000"
 
 # These are the states which Fields, Observations and Beams can have to
 # reflect where their data is available.
+class Constants(object):
+    TRUE = "true"
+    PARTIAL = "partial"
+    FALSE = "false"
+
 ARCHIVE_CHOICES = (
-    ("true", "Archived"),
-    ("partial", "Partially archived"),
-    ("false", "Not archived")
+    (Constants.TRUE, "Archived"),
+    (Constants.PARTIAL, "Partially archived"),
+    (Constants.FALSE, "Not archived")
 )
 ON_CEP_CHOICES = (
-    ("true", "Available on CEP"),
-    ("partial", "Partially available on CEP"),
-    ("false", "Not available on CEP")
+    (Constants.TRUE, "Available on CEP"),
+    (Constants.PARTIAL, "Partially available on CEP"),
+    (Constants.FALSE, "Not available on CEP")
 )
-MAX_CHOICE_LENGTH=len("partial")
+MAX_CHOICE_LENGTH=max(len(Constants.TRUE), len(Constants.PARTIAL), len(Constants.FALSE))
 
 class ArchiveSite(models.Model):
     name = models.CharField(max_length=20, primary_key=True)
@@ -97,11 +102,11 @@ class Field(models.Model):
     calibrator = models.BooleanField(default=False)
     archived = models.CharField(
         choices=ARCHIVE_CHOICES, max_length=MAX_CHOICE_LENGTH,
-        default="false", editable=False
+        default=Constants.FALSE, editable=False
     )
     on_cep = models.CharField(
         choices=ON_CEP_CHOICES, max_length=MAX_CHOICE_LENGTH,
-        default="false", editable=False
+        default=Constants.FALSE, editable=False
     )
     done = models.BooleanField(default=False)
 
@@ -111,21 +116,21 @@ class Field(models.Model):
     def _update_status(self):
         beams_per_field = self.survey.beams_per_field
 
-        if self.beam_set.filter(archived="true").count() >= beams_per_field:
-            self.archived = "true"
-        elif self.beam_set.filter(models.Q(archived="true") | models.Q(archived="partial")).count() > 0:
-            self.archived = "partial"
+        if self.beam_set.filter(archived=Constants.TRUE).count() >= beams_per_field:
+            self.archived = Constants.TRUE
+        elif self.beam_set.filter(models.Q(archived=Constants.TRUE) | models.Q(archived=Constants.PARTIAL)).count() > 0:
+            self.archived = Constants.PARTIAL
         else:
-            self.archived = "false"
+            self.archived = Constants.FALSE
 
-        if self.beam_set.filter(on_cep="true").count() >= beams_per_field:
-            self.on_cep = "true"
-        elif self.beam_set.filter(models.Q(on_cep="true") | models.Q(on_cep="partial")).count() > 0:
-            self.on_cep = "partial"
+        if self.beam_set.filter(on_cep=Constants.TRUE).count() >= beams_per_field:
+            self.on_cep = Constants.TRUE
+        elif self.beam_set.filter(models.Q(on_cep=Constants.TRUE) | models.Q(on_cep=Constants.PARTIAL)).count() > 0:
+            self.on_cep = Constants.PARTIAL
         else:
-            self.on_cep = "false"
+            self.on_cep = Constants.FALSE
 
-        if self.on_cep == "true" or self.archived == "true":
+        if self.on_cep == Constants.TRUE or self.archived == Constants.TRUE:
             self.done = True
 
         self.save()
@@ -182,11 +187,11 @@ class Observation(models.Model):
     parset = models.TextField()
     archived = models.CharField(
         choices=ARCHIVE_CHOICES, max_length=MAX_CHOICE_LENGTH,
-        default="false", editable=False
+        default=Constants.FALSE, editable=False
     )
     on_cep = models.CharField(
         choices=ON_CEP_CHOICES, max_length=MAX_CHOICE_LENGTH,
-        default="false", editable=False
+        default=Constants.FALSE, editable=False
     )
     invalid = models.BooleanField(default=False) # For use by humans
 
@@ -196,19 +201,19 @@ class Observation(models.Model):
     def _update_status(self):
         n_beams = self.beam_set.count()
 
-        if self.beam_set.filter(archived="true").count() == n_beams:
-            self.archived = "true"
-        elif self.beam_set.filter(models.Q(archived="true") | models.Q(archived="partial")).count() > 0:
-            self.archived = "partial"
+        if self.beam_set.filter(archived=Constants.TRUE).count() == n_beams:
+            self.archived = Constants.TRUE
+        elif self.beam_set.filter(models.Q(archived=Constants.TRUE) | models.Q(archived=Constants.PARTIAL)).count() > 0:
+            self.archived = Constants.PARTIAL
         else:
-            self.archived = "false"
+            self.archived = Constants.FALSE
 
-        if self.beam_set.filter(on_cep="true").count() == n_beams:
-            self.on_cep = "true"
-        elif self.beam_set.filter(models.Q(on_cep="true") | models.Q(on_cep="partial")).count() > 0:
-            self.on_cep = "partial"
+        if self.beam_set.filter(on_cep=Constants.TRUE).count() == n_beams:
+            self.on_cep = Constants.TRUE
+        elif self.beam_set.filter(models.Q(on_cep=Constants.TRUE) | models.Q(on_cep=Constants.PARTIAL)).count() > 0:
+            self.on_cep = Constants.PARTIAL
         else:
-            self.on_cep = "false"
+            self.on_cep = Constants.FALSE
 
         self.save()
 
@@ -225,8 +230,8 @@ class Beam(models.Model):
     beam = models.IntegerField()
     field = models.ForeignKey(Field)
     subbands = models.ManyToManyField(Subband)
-    archived = models.CharField(choices=ARCHIVE_CHOICES, max_length=MAX_CHOICE_LENGTH, default="false", editable=False)
-    on_cep = models.CharField(choices=ON_CEP_CHOICES, max_length=MAX_CHOICE_LENGTH, default="false", editable=False)
+    archived = models.CharField(choices=ARCHIVE_CHOICES, max_length=MAX_CHOICE_LENGTH, default=Constants.FALSE, editable=False)
+    on_cep = models.CharField(choices=ON_CEP_CHOICES, max_length=MAX_CHOICE_LENGTH, default=Constants.FALSE, editable=False)
     invalid = models.BooleanField(default=False) # For use by humans
 
     def save(self, *args, **kwargs):
@@ -242,20 +247,20 @@ class Beam(models.Model):
         # If all our subbands are archived, we are archived.
         n_archived = self.subbanddata_set.exclude(archive=None).count()
         if n_archived == n_sbs:
-            self.archived = "true"
+            self.archived = Constants.TRUE
         elif n_archived > 0:
-            self.archived = "partial"
+            self.archived = Constants.PARTIAL
         else:
-            self.archived = "false"
+            self.archived = Constants.FALSE
 
         # If all our subbands are on CEP, we are on CEP.
         n_on_cep = self.subbanddata_set.exclude(hostname="", path="").count()
         if n_on_cep == n_sbs:
-            self.on_cep = "true"
+            self.on_cep = Constants.TRUE
         elif n_on_cep > 0:
-            self.on_cep = "partial"
+            self.on_cep = Constants.PARTIAL
         else:
-            self.on_cep = "false"
+            self.on_cep = Constants.FALSE
 
         self.save()
 

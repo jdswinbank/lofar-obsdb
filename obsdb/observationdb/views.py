@@ -10,7 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models.query import QuerySet
 
-from .models import Survey, Field, Observation
+from .models import Survey, Field, Observation, Constants
 from .forms import LookupForm, FieldFilterForm
 
 from ..settings import PAGE_SIZE
@@ -37,7 +37,7 @@ def intro(request):
             'n_targets': Field.objects.filter(calibrator=False).count(),
             'n_calibrators': Field.objects.filter(calibrator=True).count(),
             'n_observations': Observation.objects.count(),
-            'n_archived': Observation.objects.filter(archived="true").count()
+            'n_archived': Observation.objects.filter(archived=Constants.TRUE).count()
         },
         context_instance=RequestContext(request)
     )
@@ -62,13 +62,13 @@ def survey_summary(request, pk):
         if f.beam_set.count() == 0:
             # Not observed
             colour = "o"
-        elif f.archived == "true":
+        elif f.archived == Constants.TRUE:
             # Data has been archived
             colour = "y"
-        elif f.on_cep == "true":
+        elif f.on_cep == Constants.TRUE:
             # Data available on CEP
             colour = "g"
-        elif f.on_cep == "partial" or f.archived == "partial":
+        elif f.on_cep == Constants.PARTIAL or f.archived == Constants.PARTIAL:
             # Partially observed
             colour = "b"
         else:
