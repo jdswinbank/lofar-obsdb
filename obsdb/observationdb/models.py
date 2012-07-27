@@ -146,6 +146,25 @@ class Field(models.Model):
         """
         return acos(sin(dec)*sin(self.dec) + cos(dec)*cos(self.dec)*cos(ra-self.ra))
 
+    @property
+    def status(self):
+        # This is slightly misleading, since it's actually possible for a
+        # field to have more than one status at once (ie, data can be both on
+        # CEP and archived), but there's no easy way to present that yet.
+        status = []
+        if self.calibrator:
+            return "Calibrator"
+        elif self.beam_set.count() == 0:
+            return "Not observed"
+        elif self.archived == Constants.TRUE:
+            return "Archived"
+        elif self.on_cep == Constants.TRUE:
+            return "On CEP"
+        elif self.on_cep == Constants.PARTIAL or self.archived == Constants.PARTIAL:
+            return "Partial"
+        else:
+            return "Unknown"
+
     class Meta:
         ordering = ['name']
 

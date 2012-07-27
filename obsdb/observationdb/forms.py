@@ -17,13 +17,24 @@ class FieldFilterForm(forms.Form):
         validators=[MaxValueValidator(360), MinValueValidator(0)],
         widget=forms.TextInput(attrs={'style':'width: 100px'}))
     survey = forms.ModelChoiceField(
-        queryset=Survey.objects.all(), required=False, empty_label="[All Surveys]",
+        queryset=Survey.objects.all(), required=False, empty_label="[All]",
+        widget=forms.Select(attrs={'style': 'width: 120px'}))
+    status = forms.ChoiceField(required=False, label="Status",
+        choices=(
+            (None, "[All]"),
+            ('cal', 'Calibrator'),
+            ('not', 'Not Observed'),
+            ('arc', 'Archived'),
+            ('cep', 'On CEP'),
+            ('par', 'Partial'),
+            ('unk', 'Unknown')
+        ),
         widget=forms.Select(attrs={'style': 'width: 120px'}))
     sort_by = forms.ChoiceField(required=False, label="Sort By",
         choices=(
             ('name', 'Name'),
             ('ra', 'RA'),
-            ('dec', "Dec"),
+            ('dec', 'Dec'),
             ('dist', 'Distance'),
             ('obs', '# Observations')
         ),

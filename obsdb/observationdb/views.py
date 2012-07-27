@@ -4,7 +4,7 @@ from django.http import Http404
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.db.models import Min, Max, Count
+from django.db.models import Min, Max, Count, Q
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -113,8 +113,24 @@ def field_list(request):
             if form.cleaned_data['survey']:
                 fields = fields.filter(survey_id=form.cleaned_data['survey'])
 
-            # Prepare for display
+            # Filter by status
             fields = fields.annotate(num_beams=Count('beam'))
+            if form.cleaned_data['status'] != "None":
+                status = form.cleaned_data['status']
+                if status == 'cal':
+                    fields = fields.filter(calibrator=True)
+                elif status == 'not':
+                    fields = fields.filter(num_beams=0)
+                elif status =='arc':
+                    fields = fields.filter(archived=Constants.TRUE)
+                elif status == 'cep':
+                    fields = fields.filter(on_cep=Constants.TRUE)
+                elif status == 'par':
+                    fields = fields.filter(Q(on_cep=Constants.PARTIAL) | Q(archived=Constants.PARTIAL))
+                else:
+                    fields = fields.filter(calibrator=False, archived=Constants.FALSE, on_cep=Constants.FALSE).exclude(num_beams=0)
+
+            # Prepare for display
             if form.cleaned_data['sort_by'] in ("name", "ra", "dec"):
                 fields = fields.order_by(form.cleaned_data['sort_by'])
             elif form.cleaned_data['sort_by'] == "obs":
