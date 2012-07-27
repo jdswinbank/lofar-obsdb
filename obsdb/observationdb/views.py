@@ -115,7 +115,7 @@ def field_list(request):
 
             # Filter by status
             fields = fields.annotate(num_beams=Count('beam'))
-            if form.cleaned_data['status'] != "None":
+            if form.cleaned_data['status'] and form.cleaned_data['status'] != "None":
                 status = form.cleaned_data['status']
                 if status == 'cal':
                     fields = fields.filter(calibrator=True)
