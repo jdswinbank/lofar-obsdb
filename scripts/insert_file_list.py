@@ -1,4 +1,4 @@
-from obsdb.observationdb.models import SubbandData
+from obsdb.observationdb.models import SubbandData, Observation
 import sys
 
 if __name__ == "__main__":
@@ -10,6 +10,7 @@ if __name__ == "__main__":
     subbands = SubbandData.objects.filter(beam__observation__obsid=obsid)
     hostname = None
 
+    print obsid
     for line in input_lines:
         if line.startswith("***********") or                   \
             line.startswith("Warning: No xauth data") or       \
@@ -34,4 +35,6 @@ if __name__ == "__main__":
 
     # Need to call this once to ensure beam/observation/field status is
     # updated to reflect the data we have inserted.
-    subbands[0].save()
+    observation = Observation.objects.get(obsid=obsid)
+    for beam in observation.beam_set.all():
+        beam._update_status()
