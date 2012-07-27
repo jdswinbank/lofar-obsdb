@@ -10,9 +10,28 @@
       <h2 style="text-align: center;">{{survey.name}}</h2>
       <h2 style="text-align: center; line-height: 20px;"><small>{{ survey.description }}</small></h2>
 
-      <p style="margin-top: 1em;">This survey consists of {{ survey.field_set.count }} fields of which
-      {{ n_observed }} ({{ percentage|floatformat }}%) have been observed a total of {{ n_beams }} times{% if n_beams > 0 %}
-      between {{ start_time|date:"j N Y" }} and {{ stop_time|date:"j N Y" }}{% endif %}.</p>
+      <table class="table" style="margin-top: 1em">
+      <tr>
+        <td style="border-top: none"># Targets</td>
+        <td style="border-top: none">{{ n_targets }}</td>
+      </tr>
+      <tr>
+        <td># Calibrators</td>
+        <td>{{ n_cals }}</td>
+      </tr>
+      <tr>
+        <td>Start Date</td>
+        <td>{{ start_time|date:"j N Y" }} </td>
+      </tr>
+      <tr>
+        <td>Stop Date</td>
+        <td>{{ stop_time|date:"j N Y" }}</td>
+      </tr>
+      <tr>
+        <td>Completed Fields</td>
+        <td>{{ n_done }} ({{ percentage|floatformat }}%)</td>
+      </tr>
+      </table>
 
       <p style="text-align: center;"><a href="/field/?survey={{ survey.name }}" class="btn btn-primary">Show me the data &raquo;</a></p>
     </div>

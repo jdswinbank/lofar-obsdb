@@ -47,15 +47,16 @@ def survey_summary(request, pk):
         s = Survey.objects.get(pk=pk)
     except ObjectDoesNotExist:
         raise Http404
-    n_beams = s.field_set.aggregate(Count('beam'))['beam__count']
-    n_observed = s.field_set.annotate(num_beams=Count('beam')).filter(num_beams__gt=0).count()
-    if s.field_set.count() > 0:
-        percentage = 100*float(n_observed)/s.field_set.count()
-    else:
-        percentage = 0
-        field_size = 0
+
+    n_targets = s.field_set.filter(calibrator=False).count()
+    n_cals = s.field_set.filter(calibrator=True).count()
     start_time = s.field_set.aggregate(Min('beam__observation__start_time')).values()[0]
     stop_time = s.field_set.aggregate(Max('beam__observation__start_time')).values()[0]
+    n_done = s.field_set.filter(calibrator=False, done=True).count()
+    if n_targets > 0:
+        percentage = 100 * float(n_done)/n_targets
+    else:
+        percentage = 0
 
     field_list = []
     for f in s.field_set.filter(calibrator=False):
@@ -83,11 +84,12 @@ def survey_summary(request, pk):
             'survey': s,
             'field_list': field_list,
             'field_size': s.field_size,
-            'n_beams': n_beams,
-            'n_observed': n_observed,
+            'n_targets': n_targets,
+            'n_done': n_done,
             'percentage': percentage,
             'start_time': start_time,
-            'stop_time': stop_time
+            'stop_time': stop_time,
+            'n_cals': n_cals
         }
     )
 
