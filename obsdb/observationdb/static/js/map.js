@@ -419,7 +419,8 @@ ProjectionMap.prototype.updateMinMax = function(p) {
 
 
 ProjectionMap.prototype.updateMapParams = function(pos_x, pos_y, zoom) {
-    var w = this.width - 100, h = this.height - 100;
+    var w = this.width-35 // - 100, h = this.height - 100;
+    var h = this.height-25
     w *= (zoom / 10.0);
     h *= (zoom / 10.0);
 
@@ -946,23 +947,21 @@ ProjectionMap.prototype.doSpin = function(p) {
 //////////////////////////////////////////////
 
 var fcolors = {
-    'g': '#008000',
-    'r': '#800000',
-    'o': '#804000',
-    'b': '#004080',
-    'y': '#808000',
-    'w': '#606060',
+    'r': 'rgb(228,26,28)',
+    'b': 'rgb(55,126,184)',
+    'g': 'rgb(77,175,74)',
+    'p': 'rgb(152,78,163)',
+    'o': 'rgb(255,127,0)',
     '' : '#999999',
 };
 
 
 var scolors = {
-    'g': '#00B000',
-    'r': '#B00000',
-    'o': '#B08000',
-    'b': '#0080B0',
-    'y': '#B0B000',
-    'w': '#E0E0E0',
+    'r': 'rgb(171,19,21)',
+    'b': 'rgb(41,95,138)',
+    'g': 'rgb(56,131,56)',
+    'p': 'rgb(114,59,122)',
+    'o': 'rgb(191,96,0)',
     '' : '#999999',
 };
 

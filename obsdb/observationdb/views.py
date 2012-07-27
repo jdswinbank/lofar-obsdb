@@ -64,7 +64,7 @@ def survey_summary(request, pk):
             colour = "o"
         elif f.archived == Constants.TRUE:
             # Data has been archived
-            colour = "y"
+            colour = "p"
         elif f.on_cep == Constants.TRUE:
             # Data available on CEP
             colour = "g"
