@@ -26,8 +26,9 @@ class FieldFilterForm(forms.Form):
             (DataStatus.CALIBRATOR, 'Calibrator'),
             (DataStatus.NOT_OBSERVED, 'Not Observed'),
             (DataStatus.ARCHIVED, 'Archived'),
+            (DataStatus.PARTIAL_ARCHIVED, 'Part Archived'),
             (DataStatus.ON_CEP, 'On CEP'),
-            (DataStatus.PARTIAL, 'Partial'),
+            (DataStatus.PARTIAL_CEP, 'Part on CEP'),
             (DataStatus.UNKNOWN, 'Unknown')
         ),
         widget=forms.Select(attrs={'style': 'width: 120px'}))

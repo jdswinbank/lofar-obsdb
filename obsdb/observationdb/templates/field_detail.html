@@ -1,5 +1,7 @@
-{% extends "base.html" %}
+{% extends "base_with_statusjs.html" %}
 {% load position %}
+{% load status %}
+
 {% block contents %}
 
 {% if field %}
@@ -28,8 +30,12 @@
           <td>{{ field.beam_set.count }}</td>
         </tr>
         <tr>
-          <td>Calibrator</td>
-          <td>{% if field.calibrator %}<i class="icon-ok"></i>{% else %}<i class="icon-remove"></i>{% endif %}</td>
+          <td>Status</td>
+          <td>
+            {% for status in field.status %}
+              <i rel="tooltip" class="{{ status|status_icon }}"></i>
+            {% endfor %}
+          </td>
         </tr>
       </table>
       <p style="margin-top: 1em; text-align:center;">
@@ -52,7 +58,7 @@
           <th>Beam</th>
           <th>Date</th>
           <th>Duration</th>
-          <th>Archived</th>
+          <th>Status</th>
         </tr>
       </thead>
       {% for beam in beam_set %}
@@ -61,7 +67,11 @@
         <td>{{ beam.beam }}</td>
         <td>{{ beam.observation.start_time|date:"Y-m-d H:i:s" }}</td>
         <td>{{ beam.observation.duration }} s</td>
-        <td>{% if beam.observation.archived == "true" %}<i class="icon-ok"></i>{% else %}<i class="icon-remove"></i>{% endif %}</td>
+        <td>
+        {% for status in beam.observation.status %}
+          <i rel="tooltip" class="{{ status|status_icon }}"></i>
+        {% endfor %}
+        </td>
       </tr>
       {% endfor %}
     </table>

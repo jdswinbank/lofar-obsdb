@@ -30,40 +30,42 @@ class DataStatus(object):
     CALIBRATOR = "cal"
     NOT_OBSERVED = "not"
     ARCHIVED = "arc"
+    PARTIAL_ARCHIVED = "par_arc"
     ON_CEP = "cep"
-    PARTIAL = "par"
+    PARTIAL_CEP = "par_cep"
     UNKNOWN = "unk"
 
-    @property
     def status(self):
         status = []
-        if self.calibrator:
-            status.append(self.CALIBRATOR)
         if self.beam_set.count() == 0:
             status.append(self.NOT_OBSERVED)
         if self.archived == Constants.TRUE:
             status.append(self.ARCHIVED)
         if self.on_cep == Constants.TRUE:
             status.append(self.ON_CEP)
-        if self.on_cep == Constants.PARTIAL or self.archived == Constants.PARTIAL:
-            status.append(self.PARTIAL)
+        if self.on_cep == Constants.PARTIAL:
+            status.append(self.PARTIAL_CEP)
+        if self.archived == Constants.PARTIAL:
+            status.append(self.PARTIAL_ARCHIVED)
         if not status:
             status.append(self.UNKNOWN)
         return status
 
     def _update_status(self, n_beams):
-        n_beams = self.beam_set.count()
-
-        if self.beam_set.filter(archived=Constants.TRUE).count() == n_beams:
+        if self.beam_set.filter(archived=Constants.TRUE).count() >= n_beams:
             self.archived = Constants.TRUE
-        elif self.beam_set.filter(models.Q(archived=Constants.TRUE) | models.Q(archived=Constants.PARTIAL)).count() > 0:
+        elif self.beam_set.filter(
+            models.Q(archived=Constants.TRUE) | models.Q(archived=Constants.PARTIAL)
+        ).count() > 0:
             self.archived = Constants.PARTIAL
         else:
             self.archived = Constants.FALSE
 
-        if self.beam_set.filter(on_cep=Constants.TRUE).count() == n_beams:
+        if self.beam_set.filter(on_cep=Constants.TRUE).count() >= n_beams:
             self.on_cep = Constants.TRUE
-        elif self.beam_set.filter(models.Q(on_cep=Constants.TRUE) | models.Q(on_cep=Constants.PARTIAL)).count() > 0:
+        elif self.beam_set.filter(
+            models.Q(on_cep=Constants.TRUE) | models.Q(on_cep=Constants.PARTIAL)
+        ).count() > 0:
             self.on_cep = Constants.PARTIAL
         else:
             self.on_cep = Constants.FALSE
@@ -166,6 +168,12 @@ class Field(models.Model, DataStatus):
         if self.on_cep == Constants.TRUE or self.archived == Constants.TRUE:
             self.done = True
         self.save()
+
+    def status(self):
+        status = super(Field, self).status()
+        if self.calibrator:
+            status.insert(0, self.CALIBRATOR)
+        return status
 
     @models.permalink
     def get_absolute_url(self):

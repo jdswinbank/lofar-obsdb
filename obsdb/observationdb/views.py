@@ -125,8 +125,10 @@ def field_list(request):
                     fields = fields.filter(archived=Constants.TRUE)
                 elif status == DataStatus.ON_CEP:
                     fields = fields.filter(on_cep=Constants.TRUE)
-                elif status == DataStatus.PARTIAL:
-                    fields = fields.filter(Q(on_cep=Constants.PARTIAL) | Q(archived=Constants.PARTIAL))
+                elif status == DataStatus.PARTIAL_ARCHIVED:
+                    fields = fields.filter(archived=Constants.PARTIAL)
+                elif status == DataStatus.PARTIAL_CEP:
+                    fields = fields.filter(on_cep=Constants.PARTIAL)
                 else:
                     fields = fields.filter(calibrator=False, archived=Constants.FALSE, on_cep=Constants.FALSE).exclude(num_beams=0)
 
