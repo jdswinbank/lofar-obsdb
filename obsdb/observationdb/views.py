@@ -63,12 +63,12 @@ def survey_summary(request, pk):
         if f.beam_set.count() == 0:
             # Not observed
             colour = "o"
-        elif f.archived == Constants.TRUE:
-            # Data has been archived
-            colour = "p"
         elif f.on_cep == Constants.TRUE:
             # Data available on CEP
             colour = "g"
+        elif f.archived == Constants.TRUE:
+            # Data has been archived
+            colour = "p"
         elif f.on_cep == Constants.PARTIAL or f.archived == Constants.PARTIAL:
             # Partially observed
             colour = "b"
