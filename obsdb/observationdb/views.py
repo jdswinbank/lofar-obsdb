@@ -29,7 +29,7 @@ def intro(request):
                 raise Http404
 
     return render_to_response(
-        'base.html',
+        'intro.html',
         {
             'n_surveys': Survey.objects.count(),
             'survey_list': Survey.objects.all(),

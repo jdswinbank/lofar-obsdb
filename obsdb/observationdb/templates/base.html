@@ -47,52 +47,7 @@
     <div class="container">
 
       {% block contents %}
-      <div class="hero-unit">
-        <h1>Welcome</h1>
-        <p>This site marshalls information about interferometric data which
-        has been recorded by <a href="http://www.lofar.org">LOFAR</a>.
-        Primarily, it aims to support the ongoing MSSS (&quot;Multifrequency
-        Snapshot Sky Survey&quot;) commissioning effort.</p>
-        <p>Use the links below to get started.</p>
-      </div>
-
-      <div class="row">
-        <div class="span4">
-          <h2>Surveys</h2>
-           <p>Data on the following survey{{ survey_list.count|pluralize }}
-           is available:</p>
-           <ul>
-             {% for survey in survey_list %}
-             <li><a href="{{ survey.get_absolute_url }}">{{ survey.name }}</a></li>
-             {% endfor %}
-           </ul>
-        </div>
-        <div class="span4">
-          <h2>Fields</h2>
-           <p>The database includes {{ n_fields }} field{{ n_fields|pluralize }} ({{ n_targets }}
-           target and {{ n_calibrators }} calibrator).</p>
-          <p><a class="btn" href="/field/">View details &raquo;</a></p>
-       </div>
-        <div class="span4">
-          <h2>Observations</h2>
-          <p>Details of {{ n_observations }} separate
-          observation{{n_observations|pluralize }} are available.
-          {{ n_archived }} of them are stored in the LOFAR archive.</p>
-          <p><a class="btn" href="/observation/">View details &raquo;</a></p>
-        </div>
-      </div>
-
-      <div class="row" style="text-align: center">
-        <p style="margin-top: 2em;">Or, jump straight to your data:<p/>
-        <form class="form-search" method="post" action="/">
-          {% csrf_token %}
-          <input id="id_target" type="text" name="target" maxlength="100" class="input-medium search-query" />
-          <button type="submit" class="btn btn-primary" name="field">Field</button>
-          <button type="submit" class="btn btn-success" name="obs">Observation</button>
-        </form>
-      </div>
-
-      {% endblock %} <!-- contents -->
+      {% endblock %}
 
       <hr>
 
