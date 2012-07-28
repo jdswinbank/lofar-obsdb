@@ -12,14 +12,6 @@ class Constants(object):
     PARTIAL = "partial"
     FALSE = "false"
 
-class FieldStatus(object):
-    CALIBRATOR = "cal"
-    NOT_OBSERVED = "not"
-    ARCHIVED = "arc"
-    ON_CEP = "cep"
-    PARTIAL = "par"
-    UNKNOWN = "unk"
-
 ARCHIVE_CHOICES = (
     (Constants.TRUE, "Archived"),
     (Constants.PARTIAL, "Partially archived"),
@@ -31,6 +23,53 @@ ON_CEP_CHOICES = (
     (Constants.FALSE, "Not available on CEP")
 )
 MAX_CHOICE_LENGTH=max(len(Constants.TRUE), len(Constants.PARTIAL), len(Constants.FALSE))
+
+
+class DataStatus(object):
+    # Mixed in to the Field and Observation models.
+    CALIBRATOR = "cal"
+    NOT_OBSERVED = "not"
+    ARCHIVED = "arc"
+    ON_CEP = "cep"
+    PARTIAL = "par"
+    UNKNOWN = "unk"
+
+    @property
+    def status(self):
+        status = []
+        if self.calibrator:
+            status.append(self.CALIBRATOR)
+        if self.beam_set.count() == 0:
+            status.append(self.NOT_OBSERVED)
+        if self.archived == Constants.TRUE:
+            status.append(self.ARCHIVED)
+        if self.on_cep == Constants.TRUE:
+            status.append(self.ON_CEP)
+        if self.on_cep == Constants.PARTIAL or self.archived == Constants.PARTIAL:
+            status.append(self.PARTIAL)
+        if not status:
+            status.append(self.UNKNOWN)
+        return status
+
+    def _update_status(self, n_beams):
+        n_beams = self.beam_set.count()
+
+        if self.beam_set.filter(archived=Constants.TRUE).count() == n_beams:
+            self.archived = Constants.TRUE
+        elif self.beam_set.filter(models.Q(archived=Constants.TRUE) | models.Q(archived=Constants.PARTIAL)).count() > 0:
+            self.archived = Constants.PARTIAL
+        else:
+            self.archived = Constants.FALSE
+
+        if self.beam_set.filter(on_cep=Constants.TRUE).count() == n_beams:
+            self.on_cep = Constants.TRUE
+        elif self.beam_set.filter(models.Q(on_cep=Constants.TRUE) | models.Q(on_cep=Constants.PARTIAL)).count() > 0:
+            self.on_cep = Constants.PARTIAL
+        else:
+            self.on_cep = Constants.FALSE
+
+        self.save()
+
 
 class ArchiveSite(models.Model):
     name = models.CharField(max_length=20, primary_key=True)
@@ -100,7 +139,7 @@ class FieldManager(models.Manager):
         )
 
 
-class Field(models.Model):
+class Field(models.Model, DataStatus):
     objects = FieldManager()
 
     name = models.CharField(max_length=100)
@@ -123,25 +162,9 @@ class Field(models.Model):
         return self.name
 
     def _update_status(self):
-        beams_per_field = self.survey.beams_per_field
-
-        if self.beam_set.filter(archived=Constants.TRUE).count() >= beams_per_field:
-            self.archived = Constants.TRUE
-        elif self.beam_set.filter(models.Q(archived=Constants.TRUE) | models.Q(archived=Constants.PARTIAL)).count() > 0:
-            self.archived = Constants.PARTIAL
-        else:
-            self.archived = Constants.FALSE
-
-        if self.beam_set.filter(on_cep=Constants.TRUE).count() >= beams_per_field:
-            self.on_cep = Constants.TRUE
-        elif self.beam_set.filter(models.Q(on_cep=Constants.TRUE) | models.Q(on_cep=Constants.PARTIAL)).count() > 0:
-            self.on_cep = Constants.PARTIAL
-        else:
-            self.on_cep = Constants.FALSE
-
+        super(Field, self)._update_status(self.survey.beams_per_field)
         if self.on_cep == Constants.TRUE or self.archived == Constants.TRUE:
             self.done = True
-
         self.save()
 
     @models.permalink
@@ -155,31 +178,11 @@ class Field(models.Model):
         """
         return acos(sin(dec)*sin(self.dec) + cos(dec)*cos(self.dec)*cos(ra-self.ra))
 
-    @property
-    def status(self):
-        # This is slightly misleading, since it's actually possible for a
-        # field to have more than one status at once (ie, data can be both on
-        # CEP and archived), but there's no easy way to present that yet.
-        status = []
-        if self.calibrator:
-            status.append(FieldStatus.CALIBRATOR)
-        if self.beam_set.count() == 0:
-            status.append(FieldStatus.NOT_OBSERVED)
-        if self.archived == Constants.TRUE:
-            status.append(FieldStatus.ARCHIVED)
-        if self.on_cep == Constants.TRUE:
-            status.append(FieldStatus.ON_CEP)
-        if self.on_cep == Constants.PARTIAL or self.archived == Constants.PARTIAL:
-            status.append(FieldStatus.PARTIAL)
-        if not status:
-            status.append(FieldStatus.UNKNOWN)
-        return status
-
     class Meta:
         ordering = ['name']
 
 
-class Observation(models.Model):
+class Observation(models.Model, DataStatus):
     ANTENNASET_CHOICES = (
         ("HBA_DUAL", "HBA_DUAL"),
         ("HBA_DUAL_INNER", "HBA_DUAL_INNER"),
@@ -228,23 +231,7 @@ class Observation(models.Model):
         return self.obsid
 
     def _update_status(self):
-        n_beams = self.beam_set.count()
-
-        if self.beam_set.filter(archived=Constants.TRUE).count() == n_beams:
-            self.archived = Constants.TRUE
-        elif self.beam_set.filter(models.Q(archived=Constants.TRUE) | models.Q(archived=Constants.PARTIAL)).count() > 0:
-            self.archived = Constants.PARTIAL
-        else:
-            self.archived = Constants.FALSE
-
-        if self.beam_set.filter(on_cep=Constants.TRUE).count() == n_beams:
-            self.on_cep = Constants.TRUE
-        elif self.beam_set.filter(models.Q(on_cep=Constants.TRUE) | models.Q(on_cep=Constants.PARTIAL)).count() > 0:
-            self.on_cep = Constants.PARTIAL
-        else:
-            self.on_cep = Constants.FALSE
-
-        self.save()
+        super(Observation, self)._update_status(self.beam_set.count())
 
     @models.permalink
     def get_absolute_url(self):
