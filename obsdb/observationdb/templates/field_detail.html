@@ -8,7 +8,7 @@
 
 <div class="row">
   <div class="span4">
-    <div class="well">
+    <div class="well" style="padding-bottom: 0em;">
       <h2 style="text-align: center;">{{field.name}}</h2>
       <h2 style="text-align: center; line-height: 20px;"><small>{{ field.description }}</small></h2>
 
@@ -38,15 +38,30 @@
           </td>
         </tr>
       </table>
-      <p style="margin-top: 1em; text-align:center;">
-        {% if beam_set.has_previous %}
-        <a href="?page={{ beam_set.previous_page_number }}"><i class="icon-backward"></i></a>
-        {% endif %}
-        Page {{ beam_set.number }} of {{ beam_set.paginator.num_pages }}
-        {% if beam_set.has_next %}
-        <a href="?page={{ beam_set.next_page_number }}"><i class="icon-forward"></i></a>
-        {% endif %}
-      </p>
+
+      <div class="pagination" style="text-align: center;">
+        <ul>
+          {% if beam_set.has_previous %}
+            {% if beam_set.previous_page_number > 1 %}
+              <li><a href="?{{ queries.urlencode }}page=1">1</a></li>
+              {% if beam_set.previous_page_number > 2 %}
+                <li class="disabled"><a href="#">...</a></li>
+              {% endif %}
+            {% endif %}
+            <li><a href="?{{ queries.urlencode }}page={{ beam_set.previous_page_number }}">{{ beam_set.previous_page_number }}</a></li>
+          {% endif %}
+            <li class="active"><a href="#">{{ beam_set.number }}</a></li>
+          {% if beam_set.has_next %}
+            <li><a href="?{{ queries.urlencode }}&amp;page={{ beam_set.next_page_number }}">{{ beam_set.next_page_number }}</a></li>
+            {% if beam_set.next_page_number < beam_set.paginator.num_pages %}
+              {% if beam_set.next_page_number|add:"1" < beam_set.paginator.num_pages %}
+                <li class="disabled"><a href="#">...</a><li>
+              {% endif %}
+              <li><a href="?{{ queries.urlencode }}&amp;page={{ beam_set.paginator.num_pages }}">{{ beam_set.paginator.num_pages }}</a></li>
+            {% endif %}
+          {% endif %}
+        </ul>
+      </div>
     </div>
   </div>
 

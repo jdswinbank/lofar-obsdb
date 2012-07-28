@@ -7,47 +7,64 @@
 
 <div class="row">
 <div class="span4">
-<form action="/field/" method="get" class="form-horizontal well">
-<h2 style="text-align: center;">{{ field_list.paginator.count }} fields</h3>
+<div class="well" style="padding-bottom: 0em;">
+  <form action="/field/" method="get" class="form-horizontal">
+  <h2 style="text-align: center;">{{ field_list.paginator.count }} fields</h3>
 
-<p>Refine the selection here. Angles should be entered in decimal degrees.</p>
+  <p>Refine the selection here. Angles should be entered in decimal degrees.</p>
 
-<div style="color: rgb(185, 74, 72);">
-{{ form.non_field_errors }}
-</div>
-
-<fieldset style="margin: auto;">
-  {% for field in form %}
-  <div class="control-group {% if field.errors %}error{% endif %}">
-    <label class="control-label" style="width: 100px; text-align: left" for="id_{{field.name}}">{{field.label}}</label>
-    <div class="controls" style="margin-left: 0px">
-      {{ field }}
-      {% if field.errors %}
-        {% for error in field.errors %}
-          <span class="help-inline" style="padding-left: 100px">{{ error }}</span>
-        {% endfor %}
-      {% endif %}
-    </div>
+  <div style="color: rgb(185, 74, 72);">
+  {{ form.non_field_errors }}
   </div>
-  {% endfor %}
-</fieldset>
 
-<p style="text-align: center;">
-<input class="btn btn-primary" type="submit" value="Apply Filter" name="apply" />
-<input class="btn btn-danger" type="submit" value="Clear Filter" name="clear"/>
-</p>
+  <fieldset style="margin: auto;">
+    {% for field in form %}
+    <div class="control-group {% if field.errors %}error{% endif %}">
+      <label class="control-label" style="width: 100px; text-align: left" for="id_{{field.name}}">{{field.label}}</label>
+      <div class="controls" style="margin-left: 0px">
+        {{ field }}
+        {% if field.errors %}
+          {% for error in field.errors %}
+            <span class="help-inline" style="padding-left: 100px">{{ error }}</span>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </fieldset>
 
-<p style="margin-top: 1em; text-align:center;">
-  {% if field_list.has_previous %}
-  <a href="?{{ queries.urlencode }}page={{ field_list.previous_page_number }}"><i class="icon-backward"></i></a>
-  {% endif %}
-  Page {{ field_list.number }} of {{ field_list.paginator.num_pages }}
-  {% if field_list.has_next %}
-  <a href="?{{ queries.urlencode }}&amp;page={{ field_list.next_page_number }}"><i class="icon-forward"></i></a>
-  {% endif %}
-</p>
-</form>
+  <p style="text-align: center;">
+  <input class="btn btn-primary" type="submit" value="Apply Filter" name="apply" />
+  <input class="btn btn-danger" type="submit" value="Clear Filter" name="clear"/>
+  </p>
 
+  </form>
+
+  <div class="pagination" style="text-align: center;">
+    <ul>
+      {% if field_list.has_previous %}
+        {% if field_list.previous_page_number > 1 %}
+          <li><a href="?{{ queries.urlencode }}page=1">1</a></li>
+          {% if field_list.previous_page_number > 2 %}
+            <li class="disabled"><a href="#">...</a></li>
+          {% endif %}
+        {% endif %}
+        <li><a href="?{{ queries.urlencode }}page={{ field_list.previous_page_number }}">{{ field_list.previous_page_number }}</a></li>
+      {% endif %}
+        <li class="active"><a href="#">{{ field_list.number }}</a></li>
+      {% if field_list.has_next %}
+        <li><a href="?{{ queries.urlencode }}&amp;page={{ field_list.next_page_number }}">{{ field_list.next_page_number }}</a></li>
+        {% if field_list.next_page_number < field_list.paginator.num_pages %}
+          {% if field_list.next_page_number|add:"1" < field_list.paginator.num_pages %}
+            <li class="disabled"><a href="#">...</a><li>
+          {% endif %}
+          <li><a href="?{{ queries.urlencode }}&amp;page={{ field_list.paginator.num_pages }}">{{ field_list.paginator.num_pages }}</a></li>
+        {% endif %}
+      {% endif %}
+    </ul>
+  </div>
+
+</div>
 </div>
 
 <div class="span8">
