@@ -124,10 +124,8 @@ class FieldListView(ListView, FormMixin):
             form_class = self.get_form_class()
             form = self.get_form(form_class)
             if form.is_valid():
-                print "valid"
                 return self.form_valid(form)
             else:
-                print "in valid"
                 return self.form_invalid(form)
 
     def form_valid(self, form):
