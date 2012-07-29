@@ -88,13 +88,23 @@
               {% for subband in beam.subbanddata_set.all %}
               <tr>
                 <td>{{ subband.number }}</td>
-                {% if subband.archive or subband.hostname and subband.path %}
-                  <td>{% if subband.size %}{{ subband.size|filesizeformat }}{% else %}-{% endif %}</td>
-                  <td>{{ subband.hostname }}</td>
-                  <td>{{ subband.path }}</td>
-                  <td>{% if subband.archive %}{{ subband.archive }}{% endif %}</td>
+                {% if subband.size %}
+                  <td>{{ subband.size|filesizeformat }}</td>
                 {% else %}
-                  <td colspan="4">No data available</td>
+                  <td><span class="label label-warning">Unknown</span></td>
+                {% endif %}
+
+                {% if subband.hostname and subband.path %}
+                  <td style="font-family: Menlo, Monaco, Consolas, monospace;">{{ subband.hostname }}</td>
+                  <td style="font-family: Menlo, Monaco, Consolas, monospace;">{{ subband.path }}</td>
+                {% else %}
+                  <td colspan="2"><span class="label label-warning">No data on CEP</span></td>
+                {% endif %}
+
+                {% if subband.archive %}
+                  <td><span class="label label-info">{{ subband.archive }}</td>
+                {% else %}
+                  <td><span class="label label-warning">Not archived</span></td>
                 {% endif %}
               </tr>
               {% endfor %}
