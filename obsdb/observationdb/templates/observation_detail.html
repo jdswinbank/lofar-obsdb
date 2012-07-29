@@ -1,4 +1,6 @@
-{% extends "base.html" %}
+{% extends "base_with_statusjs.html" %}
+{% load status %}
+
 {% block contents %}
 
 {% if observation %}
@@ -7,9 +9,16 @@
   <div class="span4">
     <div class="well">
       <h2 style="text-align: center;">{{ observation.obsid }}</h2>
-      {% if observation.archived == "true" %}
-      <p>This observation has been archived.</p>
-      {% endif %}
+
+      <table class="table" style="margin-top: 1em; margin-bottom: 1em;">
+        <tr>
+          <td style="border-top: none">Status</td>
+          <td style="border-top: none">
+            {% for status in observation.status %}
+              <i rel="tooltip" class="{{ status|status_icon }}"></i>
+            {% endfor %}
+          </td>
+        </table>
     </div>
   </div>
 
