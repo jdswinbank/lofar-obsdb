@@ -10,6 +10,29 @@
     <div class="well" style="padding-bottom: 0em;">
     <h2 style="text-align: center;">{{ paginator.count }} observations</h2>
 
+    <table class="table" style="margin-top: 1em">
+    <tr>
+      <td style="border-top: none">On CEP</td>
+      <td style="border-top: none">{{ n_on_cep }}</td>
+    </tr>
+    <tr>
+      <td>Partially on CEP</td>
+      <td>{{ n_part_on_cep }}</td>
+    </tr>
+    <tr>
+      <td>Archived</td>
+      <td>{{ n_archived }}</td>
+    </tr>
+    <tr>
+      <td>Partially archived</td>
+      <td>{{ n_part_archived }}</td>
+    </tr>
+    <tr>
+      <td>Status unknown</td>
+      <td>{{ n_unknown }}</td>
+    </tr>
+    </table>
+
     <div class="pagination" style="text-align: center;">
       <ul>
         {% if page_obj.has_previous %}

@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models.query import QuerySet
+from django.views.generic import ListView
 
 from .models import Survey, Field, Observation, Constants, DataStatus
 from .forms import LookupForm, FieldFilterForm
@@ -182,3 +183,15 @@ def field_detail(request, pk):
         {'field': field, 'beam_set': beam_set},
         context_instance=RequestContext(request)
     )
+
+class ObservationListView(ListView):
+    def get_context_data(self, **kwargs):
+        context = super(ObservationListView, self).get_context_data(**kwargs)
+        context.update({
+            "n_archived": Observation.objects.filter(archived=Constants.TRUE).count(),
+            "n_part_archived": Observation.objects.filter(archived=Constants.PARTIAL).count(),
+            "n_on_cep": Observation.objects.filter(on_cep=Constants.TRUE).count(),
+            "n_part_on_cep": Observation.objects.filter(on_cep=Constants.PARTIAL).count(),
+            "n_unknown": Observation.objects.filter(on_cep=Constants.FALSE, archived=Constants.FALSE).count()
+        })
+        return context

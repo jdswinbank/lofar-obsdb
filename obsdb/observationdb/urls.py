@@ -1,8 +1,9 @@
 from django.conf.urls import patterns, include, url
-from django.views.generic import ListView, DetailView
+from django.views.generic import DetailView
 from django.views.generic.simple import redirect_to
 
-from .models import Survey, Observation, Field
+from .models import Survey, Observation, Field, Constants
+from .views import ObservationListView
 
 from ..settings import PAGE_SIZE
 
@@ -24,11 +25,11 @@ urlpatterns = patterns('obsdb.observationdb.views',
         name="observation_detail"
     ),
     url(r'^observation/$',
-        ListView.as_view(
+        ObservationListView.as_view(
             queryset=Observation.objects.all(),
             context_object_name='obs_list',
             template_name='observation_list.html',
-            paginate_by=PAGE_SIZE,
+            paginate_by=PAGE_SIZE
         ),
         name="obs_list"
     ),
