@@ -1,5 +1,6 @@
-{% extends "base.html" %}
+{% extends "base_with_statusjs.html" %}
 {% load position %}
+{% load status %}
 
 {% block contents %}
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
@@ -43,7 +44,7 @@
         <th>Date</th>
         <th>Duration</th>
         <th>Targets</th>
-        <th>Archived</th>
+        <th>Status</th>
       </tr>
     </thead>
 
@@ -58,7 +59,11 @@
         <a href="{{ beam.field.get_absolute_url }}">{{ beam.field.name }}</a>{% if not forloop.last %},{% endif %}
       {% endfor %}
       </td>
-      <td>{% if obs.archived == "true" %}<i class="icon-ok"></i>{% else %}<i class="icon-remove"></i>{% endif %}</td>
+      <td>
+        {% for status in obs.status %}
+          <i rel="tooltip" class="{{ status|status_icon }}"></i>
+        {% endfor %}
+      </td>
     </tr>
 
     {% endfor %}
