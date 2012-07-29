@@ -9,7 +9,7 @@
 <div class="span4">
 <div class="well" style="padding-bottom: 0em;">
   <form action="/field/" method="get" class="form-horizontal">
-  <h2 style="text-align: center;">{{ field_list.paginator.count }} fields</h3>
+  <h2 style="text-align: center;">{{ paginator.count }} fields</h3>
 
   <p>Refine the selection here. Angles should be entered in decimal degrees.</p>
 
@@ -42,23 +42,23 @@
 
   <div class="pagination" style="text-align: center;">
     <ul>
-      {% if field_list.has_previous %}
-        {% if field_list.previous_page_number > 1 %}
+      {% if page_obj.has_previous %}
+        {% if page_obj.previous_page_number > 1 %}
           <li><a href="?{{ queries.urlencode }}page=1">1</a></li>
-          {% if field_list.previous_page_number > 2 %}
+          {% if page_obj.previous_page_number > 2 %}
             <li class="disabled"><a href="#">...</a></li>
           {% endif %}
         {% endif %}
-        <li><a href="?{{ queries.urlencode }}page={{ field_list.previous_page_number }}">{{ field_list.previous_page_number }}</a></li>
+        <li><a href="?{{ queries.urlencode }}page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a></li>
       {% endif %}
-        <li class="active"><a href="#">{{ field_list.number }}</a></li>
-      {% if field_list.has_next %}
-        <li><a href="?{{ queries.urlencode }}&amp;page={{ field_list.next_page_number }}">{{ field_list.next_page_number }}</a></li>
-        {% if field_list.next_page_number < field_list.paginator.num_pages %}
-          {% if field_list.next_page_number|add:"1" < field_list.paginator.num_pages %}
+        <li class="active"><a href="#">{{ page_obj.number }}</a></li>
+      {% if page_obj.has_next %}
+        <li><a href="?{{ queries.urlencode }}&amp;page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a></li>
+        {% if page_obj.next_page_number < paginator.num_pages %}
+          {% if page_obj.next_page_number|add:"1" < paginator.num_pages %}
             <li class="disabled"><a href="#">...</a><li>
           {% endif %}
-          <li><a href="?{{ queries.urlencode }}&amp;page={{ field_list.paginator.num_pages }}">{{ field_list.paginator.num_pages }}</a></li>
+          <li><a href="?{{ queries.urlencode }}&amp;page={{ paginator.num_pages }}">{{ paginator.num_pages }}</a></li>
         {% endif %}
       {% endif %}
     </ul>

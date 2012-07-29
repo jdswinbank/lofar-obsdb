@@ -119,7 +119,7 @@ class Survey(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('obsdb.observationdb.views.survey_summary', [str(self.name)])
+        return ('survey_detail', [str(self.name)])
 
 
 class FieldManager(models.Manager):

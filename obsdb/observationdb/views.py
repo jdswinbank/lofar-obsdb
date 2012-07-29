@@ -3,35 +3,35 @@ import math
 from django.http import Http404
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
-from django.template import RequestContext
-from django.db.models import Min, Max, Count, Q
+from django.db.models import Min, Max, Count
 from django.core.urlresolvers import reverse
-from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models.query import QuerySet
-from django.views.generic import ListView
+from django.views.generic import TemplateView, ListView, DetailView
+from django.views.generic.edit import FormMixin, ProcessFormView
 
 from .models import Survey, Field, Observation, Constants, DataStatus
 from .forms import LookupForm, FieldFilterForm
 
 from ..settings import PAGE_SIZE
 
-def intro(request):
-    if request.method == 'POST':
-        form = LookupForm(request.POST)
-        if form.is_valid():
-            try:
-                if "field" in request.POST:
-                    field = Field.objects.get(name=form.cleaned_data['target'])
-                    return HttpResponseRedirect(reverse('field_detail', args=(field.id,)))
-                elif "obs" in request.POST:
-                    return HttpResponseRedirect(reverse('observation_detail', args=(form.cleaned_data['target'],)))
-            except:
-                raise Http404
+class IntroView(TemplateView, ProcessFormView, FormMixin):
+    form_class = LookupForm
+    template_name = 'intro.html'
 
-    return render_to_response(
-        'intro.html',
-        {
+    def form_valid(self, form):
+        try:
+            if "field" in self.request.POST:
+                field = Field.objects.get(name=form.cleaned_data['target'])
+                return HttpResponseRedirect(reverse('field_detail', args=(field.id,)))
+            elif "obs" in self.request.POST:
+                return HttpResponseRedirect(reverse('observation_detail', args=(form.cleaned_data['target'],)))
+        except:
+            raise Http404
+
+    def get_context_data(self, **kwargs):
+        context = super(IntroView, self).get_context_data(**kwargs)
+        context.update({
             'n_surveys': Survey.objects.count(),
             'survey_list': Survey.objects.all(),
             'n_fields': Field.objects.count(),
@@ -39,152 +39,174 @@ def intro(request):
             'n_calibrators': Field.objects.filter(calibrator=True).count(),
             'n_observations': Observation.objects.count(),
             'n_archived': Observation.objects.filter(archived=Constants.TRUE).count()
-        },
-        context_instance=RequestContext(request)
-    )
+        })
+        return context
 
-def survey_summary(request, pk):
-    try:
-        s = Survey.objects.get(pk=pk)
-    except ObjectDoesNotExist:
-        raise Http404
 
-    n_targets = s.field_set.filter(calibrator=False).count()
-    n_cals = s.field_set.filter(calibrator=True).count()
-    start_time = s.field_set.aggregate(Min('beam__observation__start_time')).values()[0]
-    stop_time = s.field_set.aggregate(Max('beam__observation__start_time')).values()[0]
-    n_done = s.field_set.filter(calibrator=False, done=True).count()
-    if n_targets > 0:
-        percentage = 100 * float(n_done)/n_targets
-    else:
-        percentage = 0
+class SurveyDetailView(DetailView):
+    model = Survey
+    template_name = 'survey_detail.html'
+    context_object_name = "survey"
 
-    field_list = []
-    for f in s.field_set.filter(calibrator=False):
-        if f.beam_set.count() == 0:
-            # Not observed
-            colour = "o"
-        elif f.on_cep == Constants.TRUE:
-            # Data available on CEP
-            colour = "g"
-        elif f.archived == Constants.TRUE:
-            # Data has been archived
-            colour = "p"
-        elif f.on_cep == Constants.PARTIAL or f.archived == Constants.PARTIAL:
-            # Partially observed
-            colour = "b"
-        else:
-            # Data missing
-            colour = "r"
+    def _generate_field_list(self):
+        field_list = []
+        for f in self.object.field_set.filter(calibrator=False):
+            if f.beam_set.count() == 0:
+                # Not observed
+                colour = "o"
+            elif f.on_cep == Constants.TRUE:
+                # Data available on CEP
+                colour = "g"
+            elif f.archived == Constants.TRUE:
+                # Data has been archived
+                colour = "p"
+            elif f.on_cep == Constants.PARTIAL or f.archived == Constants.PARTIAL:
+                # Partially observed
+                colour = "b"
+            else:
+                # Data missing
+                colour = "r"
+            field_list.append((f.ra, f.dec, colour))
+        return field_list
 
-        field_list.append((f.ra, f.dec, colour))
-
-    return render_to_response(
-        'survey_detail.html',
-        {
-            'survey': s,
-            'field_list': field_list,
+    def get_context_data(self, **kwargs):
+        context = super(SurveyDetailView, self).get_context_data(**kwargs)
+        s = self.object
+        n_targets = s.field_set.filter(calibrator=False).count()
+        n_done = s.field_set.filter(calibrator=False, done=True).count()
+        context.update({
+            "n_targets": n_targets, "n_done": n_done,
+            "n_cals": s.field_set.filter(calibrator=True).count(),
+            "start_time": s.field_set.aggregate(Min('beam__observation__start_time')).values()[0],
+            "stop_time": s.field_set.aggregate(Max('beam__observation__start_time')).values()[0],
+            "percentage": 100 * float(n_done)/n_targets if n_targets > 0 else 0,
+            "field_list": self._generate_field_list(),
             'field_size': s.field_size,
-            'n_targets': n_targets,
-            'n_done': n_done,
-            'percentage': percentage,
-            'start_time': start_time,
-            'stop_time': stop_time,
-            'n_cals': n_cals
-        }
-    )
+        })
+        return context
 
-def field_list(request):
-    fields = Field.objects.all()
-    if request.method == 'GET' and not 'clear' in request.GET:
-        form = FieldFilterForm(request.GET)
-        if form.is_valid():
-            # Filter by position
-            try:
-                ra = math.radians(form.cleaned_data['ra'])
-                dec = math.radians(form.cleaned_data['dec'])
-                radius = math.radians(form.cleaned_data['radius'])
-                # Fudge factor of 1e-5 to avoid rounding errors.
-                fields = Field.objects.near_position(ra, dec, radius+1e-5)
-            except TypeError:
-                # One of the above wasn't specified -- skip this filter.
-                pass
 
-            # Filter by survey
-            if form.cleaned_data['survey']:
-                fields = fields.filter(survey_id=form.cleaned_data['survey'])
+class FieldDetailView(DetailView):
+    model = Field
+    template_name = "field_detail.html"
+    context_object_name = "field"
 
-            # Filter by status
-            fields = fields.annotate(num_beams=Count('beam'))
-            if form.cleaned_data['status'] and form.cleaned_data['status'] != "None":
-                status = form.cleaned_data['status']
-                if status == DataStatus.CALIBRATOR:
-                    fields = fields.filter(calibrator=True)
-                elif status == DataStatus.NOT_OBSERVED:
-                    fields = fields.filter(num_beams=0)
-                elif status == DataStatus.ARCHIVED:
-                    fields = fields.filter(archived=Constants.TRUE)
-                elif status == DataStatus.ON_CEP:
-                    fields = fields.filter(on_cep=Constants.TRUE)
-                elif status == DataStatus.PARTIAL_ARCHIVED:
-                    fields = fields.filter(archived=Constants.PARTIAL)
-                elif status == DataStatus.PARTIAL_CEP:
-                    fields = fields.filter(on_cep=Constants.PARTIAL)
-                else:
-                    fields = fields.filter(calibrator=False, archived=Constants.FALSE, on_cep=Constants.FALSE).exclude(num_beams=0)
+    def get_context_data(self, **kwargs):
+        context = super(FieldDetailView, self).get_context_data(**kwargs)
+        paginator = Paginator(self.object.beam_set.all(), PAGE_SIZE)
+        page = self.request.GET.get('page')
+        try:
+            beam_set = paginator.page(page)
+        except PageNotAnInteger:
+            beam_set = paginator.page(1)
+        except EmptyPage:
+            beam_set = paginator.page(paginator.num_pages)
+        context['beam_set'] = beam_set
+        return context
 
-            # Prepare for display
-            if form.cleaned_data['sort_by'] in ("name", "ra", "dec"):
-                fields = fields.order_by(form.cleaned_data['sort_by'])
-            elif form.cleaned_data['sort_by'] == "obs":
-                fields = fields.order_by('-num_beams')
-            elif form.cleaned_data['sort_by'] == "dist":
-                fields = sorted(fields, key=lambda x: x.distance)
-            if form.cleaned_data['reverse']:
-                # The semantics of reverse() are different for querysets and
-                # normal Python iterators.
-                if isinstance(fields, QuerySet):
-                    fields = fields.reverse()
-                else:
-                    fields.reverse()
 
-    else:
-        form = FieldFilterForm()
+class FieldListView(ListView, FormMixin):
+    model = Field
+    form_class = FieldFilterForm
+    template_name = "field_list.html"
+    paginate_by = 100
+    context_object_name = "field_list"
 
-    queries = request.GET.copy()
-    if queries.has_key('page'):
-        page = int(queries['page'])
-        del queries['page']
-    else:
-        page = 1
+    def get_form_kwargs(self):
+        kwargs = {'initial': self.get_initial()}
+        kwargs.update({'data': self.request.GET})
+        return kwargs
 
-    paginator = Paginator(fields, PAGE_SIZE)
-    field_list = paginator.page(page)
+    def get(self, request, *args, **kwargs):
+        if "clear" in request.GET:
+            return HttpResponseRedirect(reverse('field_list'))
+        else:
+            form_class = self.get_form_class()
+            form = self.get_form(form_class)
+            if form.is_valid():
+                print "valid"
+                return self.form_valid(form)
+            else:
+                print "in valid"
+                return self.form_invalid(form)
 
-    return render_to_response(
-        'field_list.html',
-        {'field_list': field_list, 'form': form, 'queries': queries},
-        context_instance=RequestContext(request)
-    )
+    def form_valid(self, form):
+        # Filter by position
+        try:
+            ra = math.radians(form.cleaned_data['ra'])
+            dec = math.radians(form.cleaned_data['dec'])
+            radius = math.radians(form.cleaned_data['radius'])
+            # Fudge factor of 1e-5 to avoid rounding errors.
+            fields = Field.objects.near_position(ra, dec, radius+1e-5)
+        except TypeError:
+            # One of the above wasn't specified -- skip this filter.
+            fields = Field.objects.all()
 
-def field_detail(request, pk):
-    field = Field.objects.get(pk=pk)
-    paginator = Paginator(field.beam_set.all(), PAGE_SIZE)
-    page = request.GET.get('page')
-    try:
-        beam_set = paginator.page(page)
-    except PageNotAnInteger:
-        beam_set = paginator.page(1)
-    except EmptyPage:
-        beam_set = paginator.page(paginator.num_pages)
+        # Filter by survey
+        if form.cleaned_data['survey']:
+            fields = fields.filter(survey_id=form.cleaned_data['survey'])
 
-    return render_to_response(
-        'field_detail.html',
-        {'field': field, 'beam_set': beam_set},
-        context_instance=RequestContext(request)
-    )
+        # Filter by status
+        fields = fields.annotate(num_beams=Count('beam'))
+        if form.cleaned_data['status'] and form.cleaned_data['status'] != "None":
+            status = form.cleaned_data['status']
+            if status == DataStatus.CALIBRATOR:
+                fields = fields.filter(calibrator=True)
+            elif status == DataStatus.NOT_OBSERVED:
+                fields = fields.filter(num_beams=0)
+            elif status == DataStatus.ARCHIVED:
+                fields = fields.filter(archived=Constants.TRUE)
+            elif status == DataStatus.ON_CEP:
+                fields = fields.filter(on_cep=Constants.TRUE)
+            elif status == DataStatus.PARTIAL_ARCHIVED:
+                fields = fields.filter(archived=Constants.PARTIAL)
+            elif status == DataStatus.PARTIAL_CEP:
+                fields = fields.filter(on_cep=Constants.PARTIAL)
+            else:
+                fields = fields.filter(calibrator=False, archived=Constants.FALSE, on_cep=Constants.FALSE).exclude(num_beams=0)
+
+        # Prepare for display
+        if form.cleaned_data['sort_by'] in ("name", "ra", "dec"):
+            fields = fields.order_by(form.cleaned_data['sort_by'])
+        elif form.cleaned_data['sort_by'] == "obs":
+            fields = fields.order_by('-num_beams')
+        elif form.cleaned_data['sort_by'] == "dist":
+            fields = sorted(fields, key=lambda x: x.distance)
+        if form.cleaned_data['reverse']:
+            # The semantics of reverse() are different for querysets and
+            # normal Python iterators.
+            if isinstance(fields, QuerySet):
+                fields = fields.reverse()
+            else:
+                fields.reverse()
+
+        self.object_list = fields
+        return self.render_to_response(self.get_context_data(form=form, object_list=self.object_list))
+
+    def form_invalid(self, form):
+        self.object_list = self.model.objects.all()
+        return self.render_to_response(self.get_context_data(form=form, object_list=self.object_list))
+
+    def get_context_data(self, **kwargs):
+        context = super(FieldListView, self).get_context_data(**kwargs)
+        queries = self.request.GET.copy()
+        if queries.has_key('page'):
+            del(queries['page'])
+        context['queries'] = queries
+        return context
+
+
+class ObservationDetailView(DetailView):
+    model = Observation
+    template_name = 'observation_detail.html'
+
 
 class ObservationListView(ListView):
+    queryset = Observation.objects.all()
+    context_object_name = 'obs_list'
+    template_name = 'observation_list.html'
+    paginate_by = PAGE_SIZE
+
     def get_context_data(self, **kwargs):
         context = super(ObservationListView, self).get_context_data(**kwargs)
         context.update({
