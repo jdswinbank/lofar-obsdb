@@ -39,29 +39,8 @@
         </tr>
       </table>
 
-      <div class="pagination" style="text-align: center;">
-        <ul>
-          {% if beam_set.has_previous %}
-            {% if beam_set.previous_page_number > 1 %}
-              <li><a href="?{{ queries.urlencode }}page=1">1</a></li>
-              {% if beam_set.previous_page_number > 2 %}
-                <li class="disabled"><a href="#">...</a></li>
-              {% endif %}
-            {% endif %}
-            <li><a href="?{{ queries.urlencode }}page={{ beam_set.previous_page_number }}">{{ beam_set.previous_page_number }}</a></li>
-          {% endif %}
-            <li class="active"><a href="#">{{ beam_set.number }}</a></li>
-          {% if beam_set.has_next %}
-            <li><a href="?{{ queries.urlencode }}&amp;page={{ beam_set.next_page_number }}">{{ beam_set.next_page_number }}</a></li>
-            {% if beam_set.next_page_number < beam_set.paginator.num_pages %}
-              {% if beam_set.next_page_number|add:"1" < beam_set.paginator.num_pages %}
-                <li class="disabled"><a href="#">...</a><li>
-              {% endif %}
-              <li><a href="?{{ queries.urlencode }}&amp;page={{ beam_set.paginator.num_pages }}">{{ beam_set.paginator.num_pages }}</a></li>
-            {% endif %}
-          {% endif %}
-        </ul>
-      </div>
+      {% include "paginate.html" with page_obj=beam_set paginator=beam_set.paginator %}
+
     </div>
   </div>
 
