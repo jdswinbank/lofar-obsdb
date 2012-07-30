@@ -14,8 +14,8 @@ class LookupForm(forms.Form):
 
 
 class AngleField(forms.FloatField):
-    hms = re.compile("(?P<hour>\d{1,2})h(?P<minute>\d{1,2})m(?P<second>\d{1,2}(\.\d+)?)s", re.IGNORECASE)
-    dms = re.compile("(?P<degree>[-+]?\d{1,2})d(?P<minute>\d{1,2})m(?P<second>\d{1,2}(\.\d+)?)s", re.IGNORECASE)
+    hms = re.compile("(?P<hour>\d+)h(?P<minute>\d{1,2})m(?P<second>\d{1,2}(\.\d+)?)s", re.IGNORECASE)
+    dms = re.compile("(?P<degree>[-+]?\d+)d(?P<minute>\d{1,2})m(?P<second>\d{1,2}(\.\d+)?)s", re.IGNORECASE)
 
     def to_python(self, value):
         if not value:
