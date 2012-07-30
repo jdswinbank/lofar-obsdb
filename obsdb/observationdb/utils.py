@@ -35,4 +35,4 @@ def dms_to_radians(d, m ,s):
     seconds = ASEC_IN_DEGREE * d + \
               ASEC_IN_AMIN * m +   \
               s
-    return sign * math.degrees(seconds / ASEC_IN_DEGREE)
+    return sign * math.radians(seconds / ASEC_IN_DEGREE)

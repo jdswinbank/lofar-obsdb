@@ -1,17 +1,46 @@
+import re
+import math
+
 from django import forms
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 from .models import Survey
 from .models import DataStatus
+from .utils import hms_to_radians
+from .utils import dms_to_radians
 
 class LookupForm(forms.Form):
     target = forms.CharField(max_length=100)
 
+
+class AngleField(forms.FloatField):
+    hms = re.compile("(?P<hour>\d{1,2})h(?P<minute>\d{1,2})m(?P<second>\d{1,2}(\.\d+)?)s", re.IGNORECASE)
+    dms = re.compile("(?P<degree>[-+]?\d{1,2})d(?P<minute>\d{1,2})m(?P<second>\d{1,2}(\.\d+)?)s", re.IGNORECASE)
+
+    def to_python(self, value):
+        if not value:
+            return None
+        match = self.hms.match(value)
+        if match:
+            hour = float(match.groupdict()["hour"])
+            minute = float(match.groupdict()["minute"])
+            second = float(match.groupdict()["second"])
+            value = math.degrees(hms_to_radians(hour, minute, second))
+        else:
+            match = self.dms.match(value)
+            if match:
+                degree = float(match.groupdict()["degree"])
+                minute = float(match.groupdict()["minute"])
+                second = float(match.groupdict()["second"])
+                value = math.degrees(dms_to_radians(degree, minute, second))
+        return super(AngleField, self).to_python(value)
+
+
 class FieldFilterForm(forms.Form):
-    ra = forms.FloatField(required=False, label="Right Ascension",
+    ra = AngleField(required=False, label="Right Ascension",
         validators=[MaxValueValidator(360), MinValueValidator(0)],
         widget=forms.TextInput(attrs={'style':'width: 100px'}))
-    dec = forms.FloatField(required=False, label="Declination",
+    dec = AngleField(required=False, label="Declination",
         validators=[MaxValueValidator(90), MinValueValidator(-90)],
         widget=forms.TextInput(attrs={'style':'width: 100px'}))
     radius = forms.FloatField(required=False, label="Search Radius",
