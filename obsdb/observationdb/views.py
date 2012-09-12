@@ -50,37 +50,57 @@ class SurveyDetailView(DetailView):
 
     def _generate_field_list(self):
         field_list = []
+        counts = {
+            "not_observed": 0,
+            "on_cep": 0,
+            "archived": 0,
+            "partial": 0,
+            "missing": 0
+        }
         for f in self.object.field_set.filter(calibrator=False):
             if f.beam_set.count() == 0:
                 # Not observed
                 colour = "o"
+                counts["not_observed"] += 1
             elif f.on_cep == Constants.TRUE:
                 # Data available on CEP
                 colour = "g"
+                counts["on_cep"] += 1
             elif f.archived == Constants.TRUE:
                 # Data has been archived
                 colour = "p"
+                counts["archived"] += 1
             elif f.on_cep == Constants.PARTIAL or f.archived == Constants.PARTIAL:
                 # Partially observed
                 colour = "b"
+                counts["partial"] += 1
             else:
                 # Data missing
                 colour = "r"
+                counts["missing"] += 1
             field_list.append((f.ra, f.dec, colour))
-        return field_list
+        return field_list, counts
 
     def get_context_data(self, **kwargs):
         context = super(SurveyDetailView, self).get_context_data(**kwargs)
         s = self.object
         n_targets = s.field_set.filter(calibrator=False).count()
         n_done = s.field_set.filter(calibrator=False, done=True).count()
+        field_list, counts = self._generate_field_list()
+        if n_targets > 0:
+            percentages = { key : 100 * float(value)/n_targets for key, value in counts.iteritems() }
+            percentages["done"] = 100 * float(n_done)/n_targets
+        else:
+            percentages = { key : 0 for key, value in counts }
+            percentages["done"] = 0
+
         context.update({
             "n_targets": n_targets, "n_done": n_done,
             "n_cals": s.field_set.filter(calibrator=True).count(),
             "start_time": s.field_set.aggregate(Min('beam__observation__start_time')).values()[0],
             "stop_time": s.field_set.aggregate(Max('beam__observation__start_time')).values()[0],
-            "percentage": 100 * float(n_done)/n_targets if n_targets > 0 else 0,
-            "field_list": self._generate_field_list(),
+            "percentages": percentages,
+            "field_list": field_list,
             'field_size': s.field_size,
         })
         return context

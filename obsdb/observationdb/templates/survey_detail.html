@@ -29,7 +29,7 @@
       </tr>
       <tr>
         <td>Completed Fields</td>
-        <td>{{ n_done }} ({{ percentage|floatformat }}%)</td>
+        <td>{{ n_done }} ({{ percentages.done|floatformat }}%)</td>
       </tr>
       </table>
 
@@ -58,11 +58,11 @@
 
         <td style="text-align:left; padding-left: 2em;">
           <ul class="unstyled">
-            <li><span class="label" style="background-color: rgb(77,175,74)">Data available on CEP</span></li>
-            <li><span class="label" style="background-color: rgb(152,78,163)">Data archived</span></li>
-            <li><span class="label" style="background-color: rgb(55,126,184)">Partial data available</span></li>
-            <li><span class="label" style="background-color: rgb(228,26,28)">Data missing</span></li>
-            <li><span class="label" style="background-color: rgb(255,127,0)">Not yet observed</span></li>
+            <li><span class="label" style="background-color: rgb(77,175,74)">Data available on CEP ({{ percentages.on_cep|floatformat }}%)</span></li>
+            <li><span class="label" style="background-color: rgb(152,78,163)">Data archived ({{ percentages.archived|floatformat }}%)</span></li>
+            <li><span class="label" style="background-color: rgb(55,126,184)">Partial data available ({{ percentages.partial|floatformat }}%)</span></li>
+            <li><span class="label" style="background-color: rgb(228,26,28)">Data missing ({{ percentages.missing|floatformat }}%)</span></li>
+            <li><span class="label" style="background-color: rgb(255,127,0)">Not yet observed ({{ percentages.not_observed|floatformat }}%)</span></li>
           </ul>
         </td>
       </tr>
