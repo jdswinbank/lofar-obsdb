@@ -301,7 +301,7 @@ class SubbandData(models.Model):
     beam = models.ForeignKey(Beam)
     number = models.IntegerField()
     subband = models.ForeignKey(Subband)
-    size = models.IntegerField(blank=True, null=True) # Bytes?
+    size = models.IntegerField(blank=True, null=True) # Bytes
     hostname = models.CharField(max_length=20, blank=True)
     path = models.CharField(max_length=150, blank=True)
     archive = models.ForeignKey(ArchiveSite, blank=True, null=True)
