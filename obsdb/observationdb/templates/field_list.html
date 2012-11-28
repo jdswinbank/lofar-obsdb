@@ -1,9 +1,38 @@
 {% extends "base_with_statusjs.html" %}
+{% load staticfiles %}
 {% load position %}
 {% load status %}
 
+{% block javascript %}
+<script src="{% static "js/lookup.js" %}"></script>
+{% endblock %}
+
 {% block contents %}
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<div id="lookUpSearch" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <!-- <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button> -->
+    <h3 id="lookUpSearchLabel">Search by Target Name</h3>
+  </div>
+  <div class="modal-body">
+
+  <p style="float: right">
+    Powered by<br /><a href="http://www.strudel.org.uk/lookUP/"><img src="http://www.strudel.org.uk/lookUP/logo_title.png" alt="LookUP" /></a>
+  </p>
+
+  <form id="lookUPform", name="lookUPform" action="javascript:lookUP(document.getElementById('lookUPform'));">
+    <label>Name of object to search for:</label>
+    <input type="text" name="name" />
+  </form>
+  <div class="well" id="lookUPresults"></div>
+
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    <button class="btn btn-primary" onClick="lookUP(document.getElementById('lookUPform'));">Search</button>
+  </div>
+</div>
 
 <div class="row">
 <div class="span4">
@@ -16,6 +45,11 @@
   Consolas, monospace;">+/-NNdNNmNN.nns</span>) or times (<span
   style="font-family: Menlo, Monaco, Consolas,
   monospace;">NNhNNmNN.nns</span>); the search radius is in decimal degrees.</p>
+
+  <p style="text-align:center">
+  <a href="#lookUpSearch" role="button" class="btn btn-success" data-toggle="modal">Search by Target Name</a>
+  </p>
+
 
   <div style="color: rgb(185, 74, 72);">
   {{ form.non_field_errors }}
