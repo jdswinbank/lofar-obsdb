@@ -36,7 +36,7 @@ function lookUP(form) {
 	if(object){
 		var el = document.getElementById("lookUPresults")
 		if(el){
-			el.innerHTML = "Searching..."
+			el.innerHTML = "<p>Searching...</p>"
 		}
 		var headID = document.getElementsByTagName("head")[0];
 		var newScript = document.createElement('script');
