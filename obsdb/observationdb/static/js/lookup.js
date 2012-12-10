@@ -20,8 +20,8 @@ function getLookUPResults(jData) {
 	var image = jData.image;
     var el = document.getElementById("lookUPresults");
     if (ra && dec && equinox == "J2000" ) {
-        id_ra.value = ra.decimal;
-        id_dec.value = dec.decimal;
+        $('#id_ra').val(ra.decimal);
+        $('#id_dec').val(dec.decimal);
         $('#lookUpSearch').modal('hide')
         el.innerHTML = "<p>Found " + target.name + ".</p>";
         return;
