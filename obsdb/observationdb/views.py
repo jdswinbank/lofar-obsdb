@@ -12,6 +12,7 @@ from django.views.generic.edit import FormMixin, ProcessFormView
 
 from .models import Survey, Field, Observation, Constants, DataStatus
 from .forms import LookupForm, FieldFilterForm
+from .images import get_image
 
 from ..settings import PAGE_SIZE
 
@@ -31,6 +32,7 @@ class IntroView(TemplateView, ProcessFormView, FormMixin):
 
     def get_context_data(self, **kwargs):
         context = super(IntroView, self).get_context_data(**kwargs)
+        image_url, image_caption = get_image()
         context.update({
             'n_surveys': Survey.objects.count(),
             'survey_list': Survey.objects.all(),
@@ -38,7 +40,9 @@ class IntroView(TemplateView, ProcessFormView, FormMixin):
             'n_targets': Field.objects.filter(calibrator=False).count(),
             'n_calibrators': Field.objects.filter(calibrator=True).count(),
             'n_observations': Observation.objects.count(),
-            'n_archived': Observation.objects.filter(archived=Constants.TRUE).count()
+            'n_archived': Observation.objects.filter(archived=Constants.TRUE).count(),
+            'image_url': image_url,
+            'image_caption': image_caption
         })
         return context
 
