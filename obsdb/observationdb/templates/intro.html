@@ -1,16 +1,26 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 
 {% block contents %}
-<div class="hero-unit">
-  <h1>Welcome</h1>
 
-  <p>This site marshalls information about interferometric data which has been
-  recorded by <a href="http://www.lofar.org">LOFAR</a>.  Primarily, it aims to
-  support the ongoing <a
-  href="http://www.astron.nl/radio-observatory/lofar-msss/lofar-msss">MSSS</a>
-  (&quot;Multifrequency Snapshot Sky Survey&quot;) commissioning effort.</p>
+<div class="hero-unit" style="background-image: url({% static "img/LOFAR_Superterp.jpg" %}); background-size:100% Auto; color: white; width: 820px; height: 330px;">
 
-  <p>Use the links below to get started.</p>
+  <div style="background-color: rgba(255, 255, 255, 0.8); width: 230px; height: 260px; padding: 30px; color: black; float: right;">
+    <a href="http://www.lofar.org/"><img src="{% static "img/lofar_logo.png" %}" style="width: 230px;"></a>
+    <a href="http://www.astron.nl/"><img src="{% static "img/astron_logo.png" %}" style="width: 230px; margin-top: 30px;"></a>
+    <a href="http://www.astro.uva.nl/"><img src="{% static "img/api_logo.png" %}"  style="width: 230px; margin-top: 30px;"></a>
+  </div>
+
+  <div style="background-color: rgba(255, 255, 255, 0.8); max-width: 400px; height: 260px; padding: 30px; color: black;">
+
+    <h1 style="text-align: center; font-size: 72px; margin-bottom: 18px;">MSSS</h1>
+
+    <p>This site marshalls information about interferometric data which has been
+    recorded by <a href="http://www.lofar.org/">LOFAR</a>.  Primarily, it aims to
+    support the ongoing <a href="http://www.astron.nl/radio-observatory/lofar-msss/lofar-msss">MSSS</a>
+    ("Multifrequency Snapshot Sky Survey") commissioning effort.</p>
+
+  </div>
 </div>
 
 <div class="row">
