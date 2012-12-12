@@ -10,6 +10,7 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models.query import QuerySet
 from django.views.generic import TemplateView, ListView, DetailView
 from django.views.generic.edit import FormMixin, ProcessFormView
+from django.utils.safestring import mark_safe
 
 from .models import Survey, Field, Observation, Constants, DataStatus
 from .forms import LookupForm, FieldFilterForm
@@ -43,7 +44,7 @@ class IntroView(TemplateView, ProcessFormView, FormMixin):
             'n_observations': Observation.objects.count(),
             'n_archived': Observation.objects.filter(archived=Constants.TRUE).count(),
             'image_url': image_url,
-            'image_caption': image_caption
+            'image_caption': mark_safe(image_caption)
         })
         return context
 
