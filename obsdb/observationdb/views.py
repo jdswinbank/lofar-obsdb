@@ -1,4 +1,5 @@
 import math
+from random import choice
 
 from django.http import Http404
 from django.http import HttpResponseRedirect
@@ -12,9 +13,9 @@ from django.views.generic.edit import FormMixin, ProcessFormView
 
 from .models import Survey, Field, Observation, Constants, DataStatus
 from .forms import LookupForm, FieldFilterForm
-from .images import get_image
 
 from ..settings import PAGE_SIZE
+from ..settings import SPLASH_IMAGES
 
 class IntroView(TemplateView, ProcessFormView, FormMixin):
     form_class = LookupForm
@@ -32,7 +33,7 @@ class IntroView(TemplateView, ProcessFormView, FormMixin):
 
     def get_context_data(self, **kwargs):
         context = super(IntroView, self).get_context_data(**kwargs)
-        image_url, image_caption = get_image()
+        image_url, image_caption = choice(SPLASH_IMAGES)
         context.update({
             'n_surveys': Survey.objects.count(),
             'survey_list': Survey.objects.all(),
