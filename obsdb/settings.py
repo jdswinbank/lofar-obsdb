@@ -149,7 +149,7 @@ PAGE_SIZE = 100
 # These images are suitable for adding some bling to the front page
 # We need a tuple of URL & (if required) caption.
 SPLASH_IMAGES = [
-    (STATIC_URL + "img/CygnusA.jpg", "J. McKean & M. Wise"),
     (STATIC_URL + "img/LOFAR_Superterp.jpg", ""),
-    (STATIC_URL + "img/LBA.jpg", "LOFAR LBA,  &copy; Hans Hordijk")
+    (STATIC_URL + "img/LBA.jpg", "LOFAR LBA,  &copy; Hans Hordijk"),
+    (STATIC_URL + "img/heald-msss.png", "")
 ]
