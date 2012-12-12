@@ -6,18 +6,18 @@
 var http_request = false;
 
 function getLookUPResults(jData) {
-	if(jData == null){
-		alert("There was a problem parsing search results");
-		return;
-	}
-	var equinox = jData.equinox;
-	var target = jData.target;
-	var coordsys = jData.coordsys;
-	var ra = jData.ra
-	var dec = jData.dec;
-	var category = jData.category;
-	var service = jData.service;
-	var image = jData.image;
+    if(jData == null){
+        alert("There was a problem parsing search results");
+        return;
+    }
+    var equinox = jData.equinox;
+    var target = jData.target;
+    var coordsys = jData.coordsys;
+    var ra = jData.ra
+    var dec = jData.dec;
+    var category = jData.category;
+    var service = jData.service;
+    var image = jData.image;
     var el = document.getElementById("lookUPresults");
     if (ra && dec && equinox == "J2000" ) {
         $('#id_ra').val(ra.decimal);
@@ -32,21 +32,21 @@ function getLookUPResults(jData) {
 }
 
 function lookUP(form) {
-	var object = form['name'].value
-	if(object){
-		var el = document.getElementById("lookUPresults")
-		if(el){
-			el.innerHTML = "<p>Searching...</p>"
-		}
-		var headID = document.getElementsByTagName("head")[0];
-		var newScript = document.createElement('script');
-		newScript.type = 'text/javascript';
-		newScript.src = 'http://www.strudel.org.uk/lookUP/json/?name='+encodeURIComponent(object)+'&callback=getLookUPResults';
-		headID.appendChild(newScript);
-	}
+    var object = form['name'].value
+    if(object){
+        var el = document.getElementById("lookUPresults")
+        if(el){
+            el.innerHTML = "<p>Searching...</p>"
+        }
+        var headID = document.getElementsByTagName("head")[0];
+        var newScript = document.createElement('script');
+        newScript.type = 'text/javascript';
+        newScript.src = 'http://www.strudel.org.uk/lookUP/json/?name='+encodeURIComponent(object)+'&callback=getLookUPResults';
+        headID.appendChild(newScript);
+    }
 }
 //function iDidMean(object) {
-//	el = document.getElementById('lookUPform');
-//	el['name'].value = object
-//	lookUP(el)
+//  el = document.getElementById('lookUPform');
+//  el['name'].value = object
+//  lookUP(el)
 //}
