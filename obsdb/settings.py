@@ -151,5 +151,5 @@ PAGE_SIZE = 100
 SPLASH_IMAGES = [
     (STATIC_URL + "img/LOFAR_Superterp.jpg", ""),
     (STATIC_URL + "img/LBA.jpg", "LOFAR LBA,  &copy; Hans Hordijk"),
-    (STATIC_URL + "img/heald-msss.jpg", "")
+    (STATIC_URL + "img/heald-msss.jpg", "Preliminary MSSS-HBA mosaic overlaid with positions of NVSS sources brighter than 5 mJy")
 ]
