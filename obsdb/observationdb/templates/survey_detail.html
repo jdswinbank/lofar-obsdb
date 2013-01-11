@@ -12,11 +12,11 @@
 
       <table class="table" style="margin-top: 1em">
       <tr>
-        <td style="border-top: none"># Targets</td>
+        <td style="border-top: none">Number of Targets</td>
         <td style="border-top: none">{{ n_targets }}</td>
       </tr>
       <tr>
-        <td># Calibrators</td>
+        <td>Number of Calibrators</td>
         <td>{{ n_cals }}</td>
       </tr>
       <tr>
@@ -30,6 +30,10 @@
       <tr>
         <td>Completed Fields</td>
         <td>{{ n_done }} ({{ percentages.done|floatformat }}%)</td>
+      </tr>
+      <tr>
+        <td>Information collected</td>
+        <td>{{ survey.updated|date:"j N Y" }}</td>
       </tr>
       </table>
 

@@ -113,6 +113,7 @@ class Survey(models.Model):
     description = models.TextField(blank=True)
     beams_per_field = models.IntegerField(default=9) # 9 for MSSS_LBA
     field_size = models.FloatField() # 2.885 for MSSS_LBA, 1.21 for MSSS_HBA
+    updated = models.DateField(auto_now=True)
 
     def __unicode__(self):
         return self.name
@@ -167,6 +168,7 @@ class Field(models.Model, DataStatus):
         super(Field, self)._update_status(self.survey.beams_per_field)
         if self.on_cep == Constants.TRUE or self.archived == Constants.TRUE:
             self.done = True
+        self.survey.save()
         self.save()
 
     def status(self):
