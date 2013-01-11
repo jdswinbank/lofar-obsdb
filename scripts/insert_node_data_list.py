@@ -26,7 +26,7 @@ if __name__ == "__main__":
         with open(filename, 'r') as f:
             for line in f:
                 size, path = line.split()
-                size = int(size)
+                size = int(size) * 1024
                 band_number = int(path.split("_")[2][-3:], 10)
                 obsid = path.split("/")[2]
                 per_obs_id[obsid].append(SubbandFileData(band_number, size, hostname, path))

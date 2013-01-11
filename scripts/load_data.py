@@ -1,7 +1,7 @@
 import sys
-import glob
+import os
+import fnmatch
 import datetime
-import os.path
 from pyrap.quanta import quantity
 from lofar.parameterset import parameterset
 from pyrap.measures import measures
@@ -178,13 +178,20 @@ def upload_to_djangodb(parsets):
                 print "WARNING! Unrecognized field: %s beam %d" % (obsid, beam_number)
 
 
+def get_file_list(root_dir):
+    matches = []
+    for root, dirnames, filenames in os.walk(root_dir):
+        for filename in fnmatch.filter(filenames, "*.parset"):
+            matches.append(os.path.join(root, filename))
+    return matches
+
 if __name__ == "__main__":
     if not Subband.objects.count() == 513:
         Subband.objects.bulk_create(
             [Subband(number=number) for number in xrange(513)]
         )
 
-    filenames = glob.glob("/home/jds/tmp/parsets/L*.parset")
+    filenames = get_file_list(sys.argv[1])
     parsets = load_parsets(filenames)
     parsets = [
         parset for parset in parsets if
