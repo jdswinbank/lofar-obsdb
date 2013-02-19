@@ -21,4 +21,4 @@ if __name__ == "__main__":
     with open(archive_list, 'r') as f:
         l = f.readlines()
         for line in l[1:]:
-            mark_as_archived(line.strip(), site)
+            mark_as_archived(line.strip().strip('"'), site)
