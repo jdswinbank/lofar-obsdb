@@ -52,18 +52,26 @@ class DataStatus(object):
         return status
 
     def _update_status(self, n_beams):
-        if self.beam_set.filter(archived=Constants.TRUE).count() >= n_beams:
+        if self.beam_set.filter(
+            archived=Constants.TRUE, observation__invalid=False
+        ).count() >= n_beams:
             self.archived = Constants.TRUE
         elif self.beam_set.filter(
+            observation__invalid=False
+        ).filter(
             models.Q(archived=Constants.TRUE) | models.Q(archived=Constants.PARTIAL)
         ).count() > 0:
             self.archived = Constants.PARTIAL
         else:
             self.archived = Constants.FALSE
 
-        if self.beam_set.filter(on_cep=Constants.TRUE).count() >= n_beams:
+        if self.beam_set.filter(
+            on_cep=Constants.TRUE, observation__invalid=False
+        ).count() >= n_beams:
             self.on_cep = Constants.TRUE
         elif self.beam_set.filter(
+            observation__invalid=False
+        ).filter(
             models.Q(on_cep=Constants.TRUE) | models.Q(on_cep=Constants.PARTIAL)
         ).count() > 0:
             self.on_cep = Constants.PARTIAL

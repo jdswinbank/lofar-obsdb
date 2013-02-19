@@ -64,7 +64,7 @@ class SurveyDetailView(DetailView):
             "missing": 0
         }
         for f in self.object.field_set.filter(calibrator=False):
-            if f.beam_set.count() == 0:
+            if f.beam_set.filter(observation__invalid=False).count() == 0:
                 # Not observed
                 colour = "o"
                 counts["not_observed"] += 1
@@ -82,6 +82,7 @@ class SurveyDetailView(DetailView):
                 counts["partial"] += 1
             else:
                 # Data missing
+                print f
                 colour = "r"
                 counts["missing"] += 1
             field_list.append((f.ra, f.dec, colour))
@@ -233,11 +234,13 @@ class ObservationListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ObservationListView, self).get_context_data(**kwargs)
+        good_observations = Observation.objects.filter(invalid=False)
         context.update({
-            "n_archived": Observation.objects.filter(archived=Constants.TRUE).count(),
-            "n_part_archived": Observation.objects.filter(archived=Constants.PARTIAL).count(),
-            "n_on_cep": Observation.objects.filter(on_cep=Constants.TRUE).count(),
-            "n_part_on_cep": Observation.objects.filter(on_cep=Constants.PARTIAL).count(),
-            "n_unknown": Observation.objects.filter(on_cep=Constants.FALSE, archived=Constants.FALSE).count()
+            "n_archived": good_observations.filter(archived=Constants.TRUE).count(),
+            "n_part_archived": good_observations.filter(archived=Constants.PARTIAL).count(),
+            "n_on_cep": good_observations.filter(on_cep=Constants.TRUE).count(),
+            "n_part_on_cep": good_observations.filter(on_cep=Constants.PARTIAL).count(),
+            "n_unknown": good_observations.filter(on_cep=Constants.FALSE, archived=Constants.FALSE).count(),
+            "n_invalid": Observation.objects.filter(invalid=True).count()
         })
         return context

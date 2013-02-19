@@ -28,6 +28,10 @@
       <td>{{ n_part_archived }}</td>
     </tr>
     <tr>
+      <td>Invalid/Failed</td>
+      <td>{{ n_invalid }}</td>
+    </tr>
+    <tr>
       <td>Status unknown</td>
       <td>{{ n_unknown }}</td>
     </tr>
@@ -62,9 +66,13 @@
       {% endfor %}
       </td>
       <td>
-        {% for status in obs.status %}
-          <i rel="tooltip" class="{{ status|status_icon }}"></i>
-        {% endfor %}
+        {% if obs.invalid %}
+          <i rel="tooltip" class="icon-ban-circle"></i>
+        {% else %}
+          {% for status in obs.status %}
+            <i rel="tooltip" class="{{ status|status_icon }}"></i>
+          {% endfor %}
+        {% endif %}
       </td>
     </tr>
 

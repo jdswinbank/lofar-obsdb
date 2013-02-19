@@ -62,9 +62,13 @@
         <td>{{ beam.observation.start_time|date:"Y-m-d H:i:s" }}</td>
         <td>{{ beam.observation.duration }} s</td>
         <td>
-        {% for status in beam.observation.status %}
-          <i rel="tooltip" class="{{ status|status_icon }}"></i>
-        {% endfor %}
+        {% if beam.observation.invalid %}
+          <i rel="tooltip" class="icon-ban-circle"></i>
+        {% else %}
+          {% for status in beam.observation.status %}
+            <i rel="tooltip" class="{{ status|status_icon }}"></i>
+          {% endfor %}
+        {% endif %}
         </td>
       </tr>
       {% endfor %}
