@@ -55,6 +55,12 @@
   <form class="form-search" method="post" action="/">
     {% csrf_token %}
     <input id="id_target" type="text" name="target" maxlength="100" class="input-medium search-query" />
+    <select style="width: 120px" name="survey">
+      <option value="" selected="selected">Any Survey</option>
+      {% for survey in survey_list %}
+        <option value="{{ survey.id }}">{{ survey.name }}</option>
+      {% endfor %}
+    </select>
     <button type="submit" class="btn btn-primary" name="field">Field</button>
     <button type="submit" class="btn btn-success" name="obs">Observation</button>
   </form>

@@ -11,6 +11,9 @@ from .utils import dms_to_radians
 
 class LookupForm(forms.Form):
     target = forms.CharField(max_length=100)
+    survey = forms.ModelChoiceField(
+        queryset=Survey.objects.all(), required=False, empty_label="Any Survey"
+    )
 
 
 class AngleField(forms.FloatField):

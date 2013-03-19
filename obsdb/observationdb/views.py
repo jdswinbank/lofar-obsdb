@@ -25,7 +25,11 @@ class IntroView(TemplateView, ProcessFormView, FormMixin):
     def form_valid(self, form):
         try:
             if "field" in self.request.POST:
-                field = Field.objects.filter(name=form.cleaned_data['target'])[0]
+                if form.cleaned_data['survey']:
+                    fields = Field.objects.filter(survey=form.cleaned_data['survey'])
+                else:
+                    fields = Field.objects.all()
+                field = fields.get(name=form.cleaned_data['target'])
                 return HttpResponseRedirect(reverse('field_detail', args=(field.id,)))
             elif "obs" in self.request.POST:
                 return HttpResponseRedirect(reverse('observation_detail', args=(form.cleaned_data['target'],)))
