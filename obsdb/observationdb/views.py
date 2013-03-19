@@ -29,7 +29,7 @@ class IntroView(TemplateView, ProcessFormView, FormMixin):
                     fields = Field.objects.filter(survey=form.cleaned_data['survey'])
                 else:
                     fields = Field.objects.all()
-                field = fields.get(name=form.cleaned_data['target'])
+                field = fields.filter(name=form.cleaned_data['target'])[0]
                 return HttpResponseRedirect(reverse('field_detail', args=(field.id,)))
             elif "obs" in self.request.POST:
                 return HttpResponseRedirect(reverse('observation_detail', args=(form.cleaned_data['target'],)))
