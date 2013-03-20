@@ -153,5 +153,5 @@ SPLASH_IMAGES = [
     (STATIC_URL + "img/LOFAR_Superterp2.jpg", ""),
     (STATIC_URL + "img/LBA.jpg", "LOFAR LBA,  &copy; Hans Hordijk"),
     (STATIC_URL + "img/heald-msss.jpg", "Preliminary MSSS-HBA mosaic overlaid with positions of NVSS sources brighter than 5 mJy"),
-    (STATIC_URL + "img/msss_grg.png", "<a href=\"http://www.astron.nl/about-astron/press-public/news/lofar-discovers-new-giant-galaxy-all-sky-survey/lofar-discovers-new-g\">A previously unknown gigantic radio galaxy discovered in MSSS observations</a>")
+    (STATIC_URL + "img/msss_grg.jpg", "<a href=\"http://www.astron.nl/about-astron/press-public/news/lofar-discovers-new-giant-galaxy-all-sky-survey/lofar-discovers-new-g\">A previously unknown gigantic radio galaxy discovered in MSSS observations</a>")
 ]
