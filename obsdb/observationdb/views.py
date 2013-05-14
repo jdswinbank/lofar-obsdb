@@ -4,7 +4,7 @@ from random import choice
 from django.http import Http404
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
-from django.db.models import Min, Max, Count
+from django.db.models import Min, Max, Count, Q
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models.query import QuerySet
@@ -60,36 +60,35 @@ class SurveyDetailView(DetailView):
 
     def _generate_field_list(self):
         field_list = []
-        counts = {
-            "not_observed": 0,
-            "on_cep": 0,
-            "archived": 0,
-            "partial": 0,
-            "missing": 0
-        }
-        for f in self.object.field_set.filter(calibrator=False):
-            if f.beam_set.filter(observation__invalid=False).count() == 0:
+        counts = {"missing": 0}
+        non_calibrators = self.object.field_set.filter(calibrator=False).annotate(n_beams=Count('beam'))
+
+        not_obs = non_calibrators.filter(n_beams=0)
+        field_list.extend([ra, dec, 'o'] for ra, dec in not_obs.values_list("ra", "dec"))
+        counts["not_observed"] = not_obs.count()
+
+        on_cep = non_calibrators.filter(on_cep=Constants.TRUE)
+        field_list.extend([ra, dec, 'g'] for ra, dec in on_cep.values_list("ra", "dec"))
+        counts["on_cep"] = on_cep.count()
+
+        archived = non_calibrators.filter(archived=Constants.TRUE).exclude(on_cep=Constants.TRUE)
+        field_list.extend([ra, dec, 'p'] for ra, dec in archived.values_list("ra", "dec"))
+        counts["archived"] = archived.count()
+
+        partial = non_calibrators.filter(Q(archived=Constants.PARTIAL) | Q(on_cep=Constants.PARTIAL)).exclude(on_cep=Constants.TRUE).exclude(archived=Constants.TRUE)
+        field_list.extend([ra, dec, 'b'] for ra, dec in partial.values_list("ra", "dec"))
+        counts["partial"] = partial.count()
+
+        missing = non_calibrators.filter(n_beams__gt=0).filter(archived=Constants.FALSE, on_cep=Constants.FALSE).prefetch_related('beam_set', 'beam_set__observation')
+        for f in missing:
+            if f.beam_set.filter(observation__invalid=True).count() == f.n_beams:
                 # Not observed
-                colour = "o"
                 counts["not_observed"] += 1
-            elif f.on_cep == Constants.TRUE:
-                # Data available on CEP
-                colour = "g"
-                counts["on_cep"] += 1
-            elif f.archived == Constants.TRUE:
-                # Data has been archived
-                colour = "p"
-                counts["archived"] += 1
-            elif f.on_cep == Constants.PARTIAL or f.archived == Constants.PARTIAL:
-                # Partially observed
-                colour = "b"
-                counts["partial"] += 1
+                field_list.append([f.ra, f.dec, 'o'])
             else:
-                # Data missing
-                print f
-                colour = "r"
                 counts["missing"] += 1
-            field_list.append((f.ra, f.dec, colour))
+                field_list.append([f.ra, f.dec, 'r'])
+
         return field_list, counts
 
     def get_context_data(self, **kwargs):
