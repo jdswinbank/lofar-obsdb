@@ -1,6 +1,5 @@
 from django.conf.urls import patterns, include, url
 from django.views.generic import DetailView
-from django.views.generic.simple import redirect_to
 
 from .views import IntroView
 from .views import SurveyDetailView
