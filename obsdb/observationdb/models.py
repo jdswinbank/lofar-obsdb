@@ -143,7 +143,7 @@ class FieldManager(models.Manager):
         return super(FieldManager, self).get_query_set().filter(
             dec__gte=dec-radius, dec__lte=dec+radius
         ).extra(
-            select=SortedDict([('distance', 'SELECT ACOS(SIN(dec)*SIN(%s) + COS(dec)*COS(%s)*COS(ra-%s))')]),
+            select=SortedDict([('distance', 'ACOS(SIN(dec)*SIN(%s) + COS(dec)*COS(%s)*COS(ra-%s))')]),
             select_params=(dec, dec, ra),
             where=['ACOS(SIN(dec)*SIN(%s) + COS(dec)*COS(%s)*COS(ra-%s)) <= %s'],
             params=[dec, dec, ra, radius]
