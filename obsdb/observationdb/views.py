@@ -68,11 +68,11 @@ class SurveyDetailView(DetailView):
         counts["not_observed"] = not_obs.count()
 
         on_cep = non_calibrators.filter(on_cep=Constants.TRUE)
-        field_list.extend([ra, dec, 'g'] for ra, dec in on_cep.values_list("ra", "dec"))
+        field_list.extend([ra, dec, 'p'] for ra, dec in on_cep.values_list("ra", "dec"))
         counts["on_cep"] = on_cep.count()
 
         archived = non_calibrators.filter(archived=Constants.TRUE).exclude(on_cep=Constants.TRUE)
-        field_list.extend([ra, dec, 'p'] for ra, dec in archived.values_list("ra", "dec"))
+        field_list.extend([ra, dec, 'g'] for ra, dec in archived.values_list("ra", "dec"))
         counts["archived"] = archived.count()
 
         partial = non_calibrators.filter(Q(archived=Constants.PARTIAL) | Q(on_cep=Constants.PARTIAL)).exclude(on_cep=Constants.TRUE).exclude(archived=Constants.TRUE)
