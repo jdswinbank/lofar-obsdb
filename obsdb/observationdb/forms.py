@@ -61,7 +61,7 @@ class FieldFilterForm(forms.Form):
             (DataStatus.PARTIAL_ARCHIVED, 'Part Archived'),
             (DataStatus.ON_CEP, 'On CEP'),
             (DataStatus.PARTIAL_CEP, 'Part on CEP'),
-            (DataStatus.UNKNOWN, 'Unknown')
+            (DataStatus.UNKNOWN, 'Missing/Invalid')
         ),
         widget=forms.Select(attrs={'style': 'width: 120px'}))
     sort_by = forms.ChoiceField(required=False, label="Sort By",

@@ -60,7 +60,7 @@ class SurveyDetailView(DetailView):
 
     def _generate_field_list(self):
         field_list = []
-        counts = {"missing": 0}
+        counts = {}
         non_calibrators = self.object.field_set.filter(calibrator=False).annotate(n_beams=Count('beam'))
 
         not_obs = non_calibrators.filter(n_beams=0)
@@ -79,15 +79,12 @@ class SurveyDetailView(DetailView):
         field_list.extend([ra, dec, 'b'] for ra, dec in partial.values_list("ra", "dec"))
         counts["partial"] = partial.count()
 
+        # This includes data which both couldn't be located at all and also
+        # data which is accounted for but has been marked as invalid by the
+        # observers.
         missing = non_calibrators.filter(n_beams__gt=0).filter(archived=Constants.FALSE, on_cep=Constants.FALSE).prefetch_related('beam_set', 'beam_set__observation')
-        for f in missing:
-            if f.beam_set.filter(observation__invalid=True).count() == f.n_beams:
-                # Not observed
-                counts["not_observed"] += 1
-                field_list.append([f.ra, f.dec, 'o'])
-            else:
-                counts["missing"] += 1
-                field_list.append([f.ra, f.dec, 'r'])
+        field_list.extend([ra, dec, 'r'] for ra, dec in missing.values_list("ra", "dec"))
+        counts["missing"] = missing.count()
 
         return field_list, counts
 
